@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import Header from "./Header";
 import HeroList from "./HeroList";
 import TextInsertion from "./TextInsertion";
+import DialigWindow from "./DialigWindow";
 import { makeStyles } from "@fluentui/react-components";
 import { Ribbon24Regular, LockOpen24Regular, DesignIdeas24Regular } from "@fluentui/react-icons";
 
@@ -11,6 +12,8 @@ const useStyles = makeStyles({
     minHeight: "100vh",
   },
 });
+
+const urlQueryParameters = new URLSearchParams(window.location.search);
 
 const App = (props) => {
   const styles = useStyles();
@@ -32,10 +35,16 @@ const App = (props) => {
   ];
 
   return (
+    
     <div className={styles.root}>
-      <Header logo="assets/logo-filled.png" title={props.title} message="Welcome" />
-      <HeroList message="Discover what this add-in can do for you today!" items={listItems} />
-      <TextInsertion />
+      {/* I'm a dialog window */ urlQueryParameters.get("dialogID") != null && <React.Fragment>
+        <DialigWindow dialogID={urlQueryParameters.get("dialogID")}/>
+            </React.Fragment>}
+      {/* I'm NOT a dialog window (I'm the main taskpane ui) */ urlQueryParameters.get("dialogID") == null &&<React.Fragment>
+        <Header logo="assets/logo-filled.png" title={props.title} message="Welcome" />
+        <HeroList message="Discover what this add-in can do for you today!" items={listItems} />
+        <TextInsertion />
+      </React.Fragment>}
     </div>
   );
 };
