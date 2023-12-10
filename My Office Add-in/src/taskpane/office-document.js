@@ -18,6 +18,18 @@ const insertText = async (text) => {
       range.load("formulas");
       await context.sync();
       console.log(range.formulas);
+      var formula =range.formulas[0];
+
+      console.log(formula[0])
+
+      // Разбиваем формулу на части по открывающим и закрывающим скобкам
+      var parts = formula[0].match(/[^();]+|\([^()]*\)/g);
+
+      // Выводим результат
+      for (var i = 0; i < parts.length; i++) {
+          console.log("Часть " + (i + 1) + ":", parts[i]);
+      }
+
       //sheetPropertiesChanged(range.formulas);
       //const range = sheet.getRange("A1");
       range.values = [[text]];
