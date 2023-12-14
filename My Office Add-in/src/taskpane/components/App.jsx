@@ -38,7 +38,7 @@ const App = (props) => {
     
     <div className={styles.root}>
       {/* I'm a dialog window */ urlQueryParameters.get("dialogID") != null && <React.Fragment>
-        <DialigWindow dialogID={urlQueryParameters.get("dialogID")} formula = {urlQueryParameters.get("formula")}/>
+        <DialigWindow dialogID={urlQueryParameters.get("dialogID")} lettersFormula = {urlQueryParameters.get("lettersFormula")} valuesFormula = {urlQueryParameters.get("valuesFormula")}/>
             </React.Fragment>}
       {/* I'm NOT a dialog window (I'm the main taskpane ui) */ urlQueryParameters.get("dialogID") == null &&<React.Fragment>
         <Header logo="assets/logo-filled.png" title={props.title} message="Welcome" />
