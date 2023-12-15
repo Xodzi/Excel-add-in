@@ -28,25 +28,6 @@ const TextInsertion = () => {
 
   const handleTextInsertion = async () => {
     await insertText(text);
-    /*try {
-      Excel.run(async (context) => {
-  
-        // get cell address
-        //let activeCell = context.workbook.getActiveCell();
-        //activeCell.load("address");
-        //await context.sync();
-
-        const sheet = context.workbook.worksheets.getActiveWorksheet();
-        let range = context.workbook.getSelectedRange();
-        range.load("formulas");
-        await context.sync();
-        console.log(range.formulas);
-        sheetPropertiesChanged(range.formulas);
-
-      });
-    } catch (error) {
-      console.log("Error: " + error);
-    }*/
   };
 
   const handleTextChange = async (event) => {
@@ -57,13 +38,9 @@ const TextInsertion = () => {
 
   return (
     <div className={styles.textPromptAndInsertion}>
-      <Field className={styles.textAreaField} size="large" label="Enter text to be inserted into the document.">
-        <Textarea size="large" value={text} onChange={handleTextChange} />
-      </Field>
-
-      <Field className={styles.instructions}>Click the button to insert text.</Field>
+      <Field className={styles.instructions}>Click the button to create formula tree.</Field>
       <Button appearance="primary" disabled={false} size="large" onClick={handleTextInsertion}>
-        Insert text
+        Create tree
       </Button>
     </div>
   );
