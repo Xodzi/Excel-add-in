@@ -41,7 +41,6 @@ const App = (props) => {
         <DialigWindow dialogID={urlQueryParameters.get("dialogID")} formula = {urlQueryParameters.get("formula")}/>
             </React.Fragment>}
       {/* I'm NOT a dialog window (I'm the main taskpane ui) */ urlQueryParameters.get("dialogID") == null &&<React.Fragment>
-        <Header logo="assets/logo-filled.png" title={props.title} message="Welcome" />
         <HeroList message="Discover what this add-in can do for you today!" items={listItems} />
         <TextInsertion />
       </React.Fragment>}
