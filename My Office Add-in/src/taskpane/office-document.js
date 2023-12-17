@@ -32,12 +32,13 @@ function parseCell(cell) {
 function createCellName(row, column) {
   return column + row;
 }
+
 //------------------------------------------------
 
 
 // function for formulas split (вот эту ересь надо довести до ума, потому что она неправильно сплитует строку)
 //------------------------------------------------
-function splitFormula(input) {
+/*function splitFormula(input) {
   var stack = [];
   var result = [];
 
@@ -54,7 +55,24 @@ function splitFormula(input) {
 
   return result;
 }
+*/
 //------------------------------------------------
+//var valuesFormulaArray = ["SUM(SUM(1,2),ABS(4),3,AVERAGE(MAX(8,1,5),SUM(4,3,7)))", "SUM(1,2)", "ABS(4)", "3", "AVERAGE(MAX(8,1,5),SUM(4,3,7))", "MAX(8,1,5)", "SUM(4,3,7)"];
+function to_array(tree){
+  console.log('start')
+ let general = tree.name + "("
+ let functions = [];
+ tree.arguments.forEach(element => {
+  if(element.type == 'function'){
+    temp = to_array(element);
+    general += temp;
+    console.log(general)
+  }
+
+ });
+ console.log(general)
+ return general;
+}
 
 
 // main function
