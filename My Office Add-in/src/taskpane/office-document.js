@@ -1,4 +1,5 @@
-import {parse, visit} from 'excel-formula-parser';
+//import {parse, visit} from 'excel-formula-parser';
+
 /* global Excel console */
 
 // functions for ranges convert to values arrays
@@ -36,50 +37,15 @@ function createCellName(row, column) {
 //------------------------------------------------
 
 
-// function for formulas split (вот эту ересь надо довести до ума, потому что она неправильно сплитует строку)
+// function for formulas split (вот это ересь надо довести до ума, потому что она неправильно сплитует строку)
 //------------------------------------------------
-/*function to_array(tree){
-   // console.log(tree.arguments.length)
-   // console.log('start')
-  let general = tree.name + "("
-  let functions = [];
-  tree.arguments.forEach(element => {
-    let index = 1;
-    if(element.type == 'function'){
-      cur_par = element;
-      let temp = to_array(element);
-      //console.log(general)
-      if(index == tree.arguments.length){
-        temp += ")"
-      }
-      else{
-        temp += ",";
-      }
-      index++;
-      general += temp;
-    }
-    else{
-      let temp = element.value
-      //console.log(cur_par.arguments[cur_par.arguments.length-1])
-      //console.log(temp)
-      //console.log(cur_par.arguments.length)
-      //console.log(cur_par.arguments)
-      if(cur_par.arguments[cur_par.arguments.length-1].value==temp){
-        //console.log("Сревшилось")
-        temp += ")"
-      }
-      else{
-        temp += ",";
-      }
-      index++;
-      general += temp
-    }
-  
-  });
-  return general;
-}*/
+
+
 //------------------------------------------------
+
 //var valuesFormulaArray = ["SUM(SUM(1,2),ABS(4),3,AVERAGE(MAX(8,1,5),SUM(4,3,7)))", "SUM(1,2)", "ABS(4)", "3", "AVERAGE(MAX(8,1,5),SUM(4,3,7))", "MAX(8,1,5)", "SUM(4,3,7)"];
+
+
 // main function
 //------------------------------------------------
 const insertText = async () => {
@@ -140,11 +106,11 @@ const insertText = async () => {
         calcRange = calcSheet.getRange("A1");
         calcRange.load("text");
         await context.sync();
-        console.log(calcRange.text[0][0]); 
+        //console.log(calcRange.text[0][0]); 
         formulasValuesMap.set(valuesFormulaArray[i], calcRange.text[0][0]);
       }
 
-      console.log([...formulasValuesMap.entries()]);
+      //console.log([...formulasValuesMap.entries()]);
 
       context.workbook.worksheets.getItemOrNullObject("SpecialCalculationField").delete(); // delete new calculation field
       await context.sync();
