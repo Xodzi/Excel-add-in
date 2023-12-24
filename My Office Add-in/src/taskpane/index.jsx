@@ -1,6 +1,7 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./components/App";
+import Tree from './components/TreeNode'; 
 import {parse, visit} from 'excel-formula-parser';
 import { CompassNorthwestFilled } from "@fluentui/react-icons";
 
@@ -27,8 +28,34 @@ var testFormula = "SUM(1,2,3)"; // incorrect (Cannot read properties of null (re
 const tree = parse(testFormula);
 console.log(tree);
 
-var cur_par = null;
-var functions = [testFormula];
+var bim = [];
+
+var ob = {
+  name : String,
+  depth : Number,
+  parent : null,
+  childrens : []
+}
+
+traverseTree(tree,0)
+
+function traverseTree(node, depth = 0) {
+  
+  if (node.arguments != undefined && node.arguments.length > 0) {
+    console.log(`${"  ".repeat(depth)}${node.name} - Depth: ${depth}`);
+    node.arguments.forEach((childNode) => {
+      console.log(node, depth)
+      traverseTree(childNode, depth + 1);
+
+    });
+  }
+  else{
+    console.log(node);
+  }
+}
+
+
+var cur_par = tree;
 
 let tes = to_array(tree);
 
@@ -40,9 +67,7 @@ function to_array(tree){
   let index = 1;
   cur_par = element;
   if(element.type == 'function'){
-    cur_par = element;
     let temp = to_array(element);
-    //console.log(general)
     if(index == tree.arguments.length){
       temp += ")"
     }
@@ -87,6 +112,7 @@ for(let j = 1; j < functions.length; j++){
     functions[j] = functions[j].replaceAt(i,')')
   }
 }
+
 //console.log(tes)
 console.log(functions);
 
@@ -95,7 +121,10 @@ console.log(functions);
 Office.onReady(() => {
 
   root.render(
+    <div>
       <App title={title} />
+      <Tree tree={tree} />
+      </div>
   );
 });
 
