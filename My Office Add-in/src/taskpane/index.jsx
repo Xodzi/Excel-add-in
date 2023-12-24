@@ -1,6 +1,7 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./components/App";
+import Tree from './components/TreeNode'; 
 import {parse, visit} from 'excel-formula-parser';
 import { CompassNorthwestFilled } from "@fluentui/react-icons";
 
@@ -19,7 +20,34 @@ String.prototype.replaceAt = function(index, replacement) {
 const tree = parse("SUM(SUM(1,2),ABS(4),3,AVERAGE(MAX(8,1,5),SUM(4,3,7)))");
 console.log(tree);
 
-var cur_par = null;
+var bim = [];
+
+var ob = {
+  name : String,
+  depth : Number,
+  parent : null,
+  childrens : []
+}
+
+traverseTree(tree,0)
+
+function traverseTree(node, depth = 0) {
+  
+  if (node.arguments != undefined && node.arguments.length > 0) {
+    console.log(`${"  ".repeat(depth)}${node.name} - Depth: ${depth}`);
+    node.arguments.forEach((childNode) => {
+      console.log(node, depth)
+      traverseTree(childNode, depth + 1);
+
+    });
+  }
+  else{
+    console.log(node);
+  }
+}
+
+
+var cur_par = tree;
 
 let tes = to_array(tree);
 
@@ -31,9 +59,9 @@ function to_array(tree){
  tree.arguments.forEach(element => {
   let index = 1;
   if(element.type == 'function'){
-    cur_par = element;
     let temp = to_array(element);
   //  console.log(general)
+
     if(index == tree.arguments.length){
       temp += ")"
     }
@@ -69,14 +97,15 @@ const last_index = tes.lastIndexOf(')')
 for(let i=last_index; i < tes.length; i++){
   tes = tes.replaceAt(i,')')
 }
-console.log(tes)
-
 
 /* Render application after Office initializes */
 Office.onReady(() => {
 
   root.render(
+    <div>
       <App title={title} />
+      <Tree tree={tree} />
+      </div>
   );
 });
 

@@ -41,6 +41,7 @@
     "react-accessible-treeview": "^2.8.1",
     "react-bootstrap": "^2.9.1",
     "react-dom": "^18.2.0",
+    "react-treeview": "^0.4.7",
     "regenerator-runtime": "^0.13.7",
     "treeview-react-bootstrap": "^0.4.6"
   },
