@@ -19,8 +19,8 @@ String.prototype.replaceAt = function(index, replacement) {
 
 //var testFormula = "SUM(SUM(1,2),ABS(4),3,AVERAGE(MAX(8,1,5),SUM(4,3,7)))"; // incorrect (ignore free number for sum)
 //var testFormula = "MAX(1,2,3,0,0,0,4,5,9)"; // incorrect (Cannot read properties of null (reading 'arguments'))
-var testFormula = "SUM(1,2,3)"; // incorrect (Cannot read properties of null (reading 'arguments'))
-//var testFormula = "SUM(MAX(10,3,0,2),SUM(15,3),ABS(6))"; // correct
+//var testFormula = "SUM(1,2,3)"; // incorrect (Cannot read properties of null (reading 'arguments'))
+var testFormula = "SUM(MAX(10,3,0,2),SUM(15,3),ABS(6))"; // correct
 //var testFormula = "MAX(SUM(9,4,5),5,AVERAGE(2,3),6)"; // incorrect (ignore '5' and '6', like first algos)
 //var testFormula = "2+4"; // nu, tut voobsche pizdeц (Cannot read properties of undefined (reading 'forEach'))
 
@@ -55,7 +55,7 @@ function traverseTree(node, depth = 0) {
 }
 
 
-var cur_par = tree;
+/*var cur_par = tree;
 
 let tes = to_array(tree);
 
@@ -114,7 +114,7 @@ for(let j = 1; j < functions.length; j++){
 }
 
 //console.log(tes)
-console.log(functions);
+console.log(functions);*/
 
 
 /* Render application after Office initializes */

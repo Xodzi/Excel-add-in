@@ -1,4 +1,4 @@
-//import {parse, visit} from 'excel-formula-parser';
+import {parse, visit} from 'excel-formula-parser';
 
 /* global Excel console */
 
@@ -39,6 +39,32 @@ function createCellName(row, column) {
 
 // function for formulas split (вот это ересь надо довести до ума, потому что она неправильно сплитует строку)
 //------------------------------------------------
+
+
+
+
+
+
+
+function traverseTree(node, depth = 0) {
+        
+  if (node.arguments != undefined && node.arguments.length > 0) {
+    console.log(`${"  ".repeat(depth)}${node.name} - Depth: ${depth}`);
+    node.arguments.forEach((childNode) => {
+      console.log(node, depth)
+      traverseTree(childNode, depth + 1);
+
+    });
+  }
+  else{
+    console.log(node);
+  }
+}
+
+
+
+
+
 
 
 //------------------------------------------------
@@ -85,9 +111,10 @@ const insertText = async () => {
       //const valuesFormulaArray = parse(valuesFormula);
       //console.log(lettersFormulaArray);
       //console.log(valuesFormulaArray);
-      var PIZDEZFormula = "SUM(SUM(1,2),ABS(4),3,AVERAGE(MAX(8,1,5),SUM(4,3,7)))";
-      const valuesPIZDEZ = parse(PIZDEZFormula);
-      console.log(valuesPIZDEZ);
+      var testFormula = "SUM(SUM(1,2),ABS(4),3,AVERAGE(MAX(8,1,5),SUM(4,3,7)))";
+      const tree = parse(testFormula);
+      console.log(tree);
+      traverseTree(tree,0)
       //________________________________________________
 
 
@@ -119,7 +146,7 @@ const insertText = async () => {
 
       //________________________________________________ declare dialog as global for use in later functions.
       let dialog;
-      Office.context.ui.displayDialogAsync('https://localhost:3000/taskpane.html?dialogID=15&lettersFormula=' + lettersFormula + '&valuesFormula' + valuesFormula, {height: 30, width: 20},
+      Office.context.ui.displayDialogAsync('https://localhost:3000/taskpane.html?dialogID=15&lettersFormula=' + lettersFormula + '&valuesFormula=' + valuesFormula + '&tree=' + tree, {height: 30, width: 20},
           function (asyncResult) {
               dialog = asyncResult.value;
               dialog.addEventHandler(Office.EventType.DialogMessageReceived, processMessage);
