@@ -1,3 +1,5 @@
+//import {parse, visit} from 'excel-formula-parser';
+
 /* global Excel console */
 
 // functions for ranges convert to values arrays
@@ -19,8 +21,7 @@ function createArrayFromRange(start, end) {
       }
   }
 
-  return '{' + array.join(';') + '}';
-  //return '' + array.join(',') + '';
+  return array.join(',');
 }
 
 function parseCell(cell) {
@@ -36,28 +37,15 @@ function createCellName(row, column) {
 //------------------------------------------------
 
 
-// function for formulas split (вот эту ересь надо довести до ума, потому что она неправильно сплитует строку)
+// function for formulas split (вот это ересь надо довести до ума, потому что она неправильно сплитует строку)
 //------------------------------------------------
-/*function splitFormula(input) {
-  var stack = [];
-  var result = [];
 
-  for (var i = 0; i < input.length; i++) {
-      if (input[i] === '(') {
-          stack.push(i);
-      } else if (input[i] === ')') {
-          if (stack.length > 0) {
-              var start = stack.pop();
-              result.push(input.substring(start, i + 1));
-          }
-      }
-  }
 
-  return result;
-}
-*/
-//-------------------------- SUM(SUM(1,2,,ABS(4),,3,AVERAGE(MAX(8,1,5,,SUM(4,3,7,,,
+//------------------------------------------------
+
 //var valuesFormulaArray = ["SUM(SUM(1,2),ABS(4),3,AVERAGE(MAX(8,1,5),SUM(4,3,7)))", "SUM(1,2)", "ABS(4)", "3", "AVERAGE(MAX(8,1,5),SUM(4,3,7))", "MAX(8,1,5)", "SUM(4,3,7)"];
+
+
 // main function
 //------------------------------------------------
 const insertText = async () => {
@@ -93,10 +81,13 @@ const insertText = async () => {
 
 
       //________________________________________________ create arrays with split formulas (сначала надо довести до ума функцию, которая сплитует нашу строку)
-      //var lettersFormulaArray = splitFormula(lettersFormula);
-      //var valuesFormulaArray = splitFormula(valuesFormula);
+      //const lettersFormulaArray = parse(lettersFormula);
+      //const valuesFormulaArray = parse(valuesFormula);
       //console.log(lettersFormulaArray);
       //console.log(valuesFormulaArray);
+      var PIZDEZFormula = "SUM(SUM(1,2),ABS(4),3,AVERAGE(MAX(8,1,5),SUM(4,3,7)))";
+      const valuesPIZDEZ = parse(PIZDEZFormula);
+      console.log(valuesPIZDEZ);
       //________________________________________________
 
 
@@ -115,11 +106,11 @@ const insertText = async () => {
         calcRange = calcSheet.getRange("A1");
         calcRange.load("text");
         await context.sync();
-        console.log(calcRange.text[0][0]); 
+        //console.log(calcRange.text[0][0]); 
         formulasValuesMap.set(valuesFormulaArray[i], calcRange.text[0][0]);
       }
 
-      console.log([...formulasValuesMap.entries()]);
+      //console.log([...formulasValuesMap.entries()]);
 
       context.workbook.worksheets.getItemOrNullObject("SpecialCalculationField").delete(); // delete new calculation field
       await context.sync();

@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
-import { ReactTree } from '@naisutech/react-tree';
-import TreeView, { flattenTree } from "react-accessible-treeview";
-import { HyperFormula } from 'hyperformula';
+//import { ReactTree } from '@naisutech/react-tree';
+//import TreeView, { flattenTree } from "react-accessible-treeview";
+//import { HyperFormula } from 'hyperformula';
 import {parse, visit} from 'excel-formula-parser';
-import to_array from '../office-document'
+//import to_array from '../office-document'
 
 
 
@@ -45,56 +45,6 @@ export default function DialigWindow(props) {
   const data = [['=SUM(1,2)']];
   const hfInstance = HyperFormula.buildFromArray(data, options);
   const mySum = hfInstance.getCellValue({ col: 3, row: 0, sheet: 0 });
-
-  console.log(mySum);
-
-const tree = parse("SUM(SUM(1,2),ABS(4),3,AVERAGE(MAX(8,1,5),SUM(4,3,7)))");
-console.log(tree);
-
-let tes = to_array(tree);
-
-function to_array(tree){
-  console.log(tree.arguments.length)
-  console.log('start')
- let general = tree.name + "("
- let functions = [];
- tree.arguments.forEach(element => {
-  let index = 1;
-  if(element.type == 'function'){
-    let temp = to_array(element);
-    console.log(general)
-    if(index == tree.arguments.length){
-      temp += ")"
-    }
-    else{
-      temp += ",";
-    }
-    index++;
-    general += temp;
-  }
-  else{
-    let temp = element.value
-    if(index == tree.arguments.length){
-      //console.log()
-      temp += "),"
-    }
-    else{
-      console.log(index)
-      console.log(tree.arguments.lenght)
-      console.log(element)
-      temp += ",";
-    }
-    index++;
-    general += temp
-  }
-
- });
- console.log(general)
- return general;
-}
-
-
-  
 
   // Выводим результат
   //for (var i = 0; i < parts.length; i++) {
