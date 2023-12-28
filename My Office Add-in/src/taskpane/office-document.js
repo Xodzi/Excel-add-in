@@ -34,6 +34,16 @@ function createCellName(row, column) {
   return column + row;
 }
 
+function getSubFormulas(node) {
+  if (node.type === "function") {
+    const formula = `${node.name}(${node.arguments.map(getSubFormulas).join(",")})`;
+   // console.log(formula)
+    return [formula, ...node.arguments.filter((elem) => elem.type == "function").map(getSubFormulas).flat()];
+  } else {
+    return node.value;
+  }
+}
+
 //------------------------------------------------
 
 
@@ -78,11 +88,11 @@ const insertText = async () => {
   
   try {
     Excel.run(async (context) => {
+      
       let range = context.workbook.getSelectedRange();
       range.load("formulas");
       await context.sync();
       var lettersFormula = convertRanges(range.formulas[0][0]); // Take cells formula like a string
-
 
       //________________________________________________ convert string formula to formula with numbers
       var cells = lettersFormula.match(/[A-Za-z]+\d+/g);
@@ -103,6 +113,7 @@ const insertText = async () => {
         const regex = new RegExp(key, 'g');
         valuesFormula = valuesFormula.replace(regex, value);
       }); 
+      
       //________________________________________________
 
 
@@ -111,18 +122,22 @@ const insertText = async () => {
       //const valuesFormulaArray = parse(valuesFormula);
       //console.log(lettersFormulaArray);
       //console.log(valuesFormulaArray);
-      var testFormula = "SUM(SUM(1,2),ABS(4),3,AVERAGE(MAX(8,1,5),SUM(4,3,7)))";
-      const tree = parse(testFormula);
-      console.log(tree);
-      traverseTree(tree,0)
+      const valuesPIZDEZ = parse(valuesFormula);
       //________________________________________________
 
 
       //________________________________________________ create array with pieces formulas and calculate their values
       // example of ideal formula split (здесь должна использоваться именно valuesFormulaArray, потому что по ней ведутся дальнейшие вычисления и создание formulasValuesMap)
-      var valuesFormulaArray = ["SUM(SUM(1,2),ABS(4),3,AVERAGE(MAX(8,1,5),SUM(4,3,7)))", "SUM(1,2)", "ABS(4)", "3", "AVERAGE(MAX(8,1,5),SUM(4,3,7))", "MAX(8,1,5)", "SUM(4,3,7)"];
+      //var valuesFormulaArray = ["SUM(SUM(1,2),ABS(4),3,AVERAGE(MAX(8,1,5),SUM(4,3,7)))", "SUM(1,2)", "ABS(4)", "3", "AVERAGE(MAX(8,1,5),SUM(4,3,7))", "MAX(8,1,5)", "SUM(4,3,7)"];
+      console.log(valuesPIZDEZ)
+      var valuesFormulaArray = getSubFormulas(valuesPIZDEZ);
+      console.log(valuesFormulaArray);
       context.workbook.worksheets.getItemOrNullObject("SpecialCalculationField").delete(); // delete old calculation field
       const creatFieldSheet = context.workbook.worksheets.add("SpecialCalculationField"); // add new calculation field
+
+      const formulasObjectsArray = [];
+
+      var cur_d = 0;
 
       var formulasValuesMap = new Map();
 
@@ -133,9 +148,20 @@ const insertText = async () => {
         calcRange = calcSheet.getRange("A1");
         calcRange.load("text");
         await context.sync();
+        const formulaObject = {
+          name: valuesFormulaArray[i],
+          depth: cur_d+1, // Здесь должно быть значение глубины, но оно пока не известно
+          res: calcRange.text[0][0]
+          
+        };
+        formulasObjectsArray.push(formulaObject);
+
+    
         //console.log(calcRange.text[0][0]); 
         formulasValuesMap.set(valuesFormulaArray[i], calcRange.text[0][0]);
       }
+      console.log(formulasValuesMap)
+      console.log(formulasObjectsArray)
 
       //console.log([...formulasValuesMap.entries()]);
 
@@ -145,6 +171,7 @@ const insertText = async () => {
 
 
       //________________________________________________ declare dialog as global for use in later functions.
+      return(formulasValuesMap);
       let dialog;
       Office.context.ui.displayDialogAsync('https://localhost:3000/taskpane.html?dialogID=15&lettersFormula=' + lettersFormula + '&valuesFormula=' + valuesFormula + '&tree=' + tree, {height: 30, width: 20},
           function (asyncResult) {

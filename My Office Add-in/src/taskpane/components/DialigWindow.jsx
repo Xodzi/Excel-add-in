@@ -1,7 +1,4 @@
 import React, { useState } from 'react'
-//import { ReactTree } from '@naisutech/react-tree';
-//import TreeView, { flattenTree } from "react-accessible-treeview";
-//import { HyperFormula } from 'hyperformula';
 import {parse, visit} from 'excel-formula-parser';
 import Tree from './TreeNode'; 
 //import to_array from '../office-document'
@@ -40,12 +37,7 @@ export default function DialigWindow(props) {
     leapYear1900: true,
     nullDate: { year: 1899, month: 12, day: 31 },
     smartRounding: true, // set by default
-  };
-  
-
-  const data = [['=SUM(1,2)']];
-  const hfInstance = HyperFormula.buildFromArray(data, options);
-  const mySum = hfInstance.getCellValue({ col: 3, row: 0, sheet: 0 });*/
+  };*/
 
   // Выводим результат
   //for (var i = 0; i < parts.length; i++) {
