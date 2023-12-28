@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import {parse, visit} from 'excel-formula-parser';
+import Tree from './TreeNode'; 
 //import to_array from '../office-document'
 
 
@@ -12,7 +13,7 @@ export default function DialigWindow(props) {
 
   //var valuesParts = props.valuesFormula.match(/[^();]+|\([^()]*\)/g);
 
-  const options = {
+  /*const options = {
     licenseKey: 'gpl-v3',
     dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'],
     timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
@@ -37,8 +38,9 @@ export default function DialigWindow(props) {
     nullDate: { year: 1899, month: 12, day: 31 },
     smartRounding: true, // set by default
   };
-  
-
+  const data = [['=SUM(1,2)']];
+  const hfInstance = HyperFormula.buildFromArray(data, options);
+  const mySum = hfInstance.getCellValue({ col: 3, row: 0, sheet: 0 });*/
 
   // Выводим результат
   //for (var i = 0; i < parts.length; i++) {
@@ -53,6 +55,7 @@ export default function DialigWindow(props) {
       <div>Letters Formula: {props.lettersFormula}</div>
       <div>Values Formula: {props.valuesFormula}</div>
 
+      <Tree tree={props.tree} />
      
     </div>
   )
