@@ -27,7 +27,7 @@ const TextInsertion = () => {
   const [text, setText] = useState("Some text.");
 
   const handleTextInsertion = async () => {
-    await insertText(text);
+    console.log( await insertText());
   };
 
   const handleTextChange = async (event) => {
