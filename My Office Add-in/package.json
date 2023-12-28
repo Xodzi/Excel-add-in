@@ -36,6 +36,7 @@
     "excel-formula": "^1.5.0",
     "excel-formula-parser": "^1.1.0",
     "fast-formula-parser": "^1.0.19",
+    "formulajs": "^1.0.8",
     "hyperformula": "^2.6.0",
     "react": "^18.2.0",
     "react-accessible-treeview": "^2.8.1",
