@@ -118,16 +118,7 @@ const insertText = async () => {
 
 
       //________________________________________________ create arrays with split formulas (сначала надо довести до ума функцию, которая сплитует нашу строку)
-      //const lettersFormulaArray = parse(lettersFormula);
-      //const valuesFormulaArray = parse(valuesFormula);
-      //console.log(lettersFormulaArray);
-      //console.log(valuesFormulaArray);
       const valuesPIZDEZ = parse(valuesFormula);
-     // console.log(valuesFormula);
-     // var testFormula = "SUM(SUM(1,2),ABS(4),3,AVERAGE(MAX(8,1,5),SUM(4,3,7)))";
-     // const tree = parse(testFormula);
-     // console.log(tree);
-     // traverseTree(tree,0)
       //________________________________________________
 
 
