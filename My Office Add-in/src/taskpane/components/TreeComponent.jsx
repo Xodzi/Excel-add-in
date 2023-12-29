@@ -3,7 +3,7 @@ import Button from 'react-bootstrap/Button';
 import Collapse from 'react-bootstrap/Collapse';
 import Collapsible from 'react-collapsible';
 
-const TreeNode = ({ node, isLastArgument, depth, index }) => {
+const TreeNode = ({ node, depth, index }) => {
   const nodeStyle = {
     border: node.type === 'function' ? '1px solid black' : 'none',
     padding: '10px',
@@ -27,7 +27,6 @@ const TreeNode = ({ node, isLastArgument, depth, index }) => {
             <div onClick={() => setOpen(!open)} key={index}>
               <TreeNode
                 node={arg}
-                isLastArgument={index === node.arguments.length - 1}
                 depth={depth + 1} // Увеличиваем уровень вложенности для вложенных узлов
               />
             </div>
@@ -51,7 +50,7 @@ const TreeComponent = ({ tree }) => {
   return (
     <div>
       <h1>Tree</h1>
-      <TreeNode node={tree} isLastArgument={true} depth={0} index={0} />
+      <TreeNode node={tree} depth={0} index={0} />
     </div>
   );
 };

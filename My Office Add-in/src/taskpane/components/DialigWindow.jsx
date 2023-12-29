@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import {parse, visit} from 'excel-formula-parser';
-import Tree from './TreeNode'; 
 //import to_array from '../office-document'
 
 
@@ -51,8 +50,6 @@ export default function DialigWindow(props) {
       <div>urlQuery: {props.formula}</div>
       <div>Letters Formula: {props.lettersFormula}</div>
       <div>Values Formula: {props.valuesFormula}</div>
-
-      <Tree tree={props.tree} />
      
     </div>
   )

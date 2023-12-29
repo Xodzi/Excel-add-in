@@ -36,11 +36,18 @@ function createCellName(row, column) {
 
 function getSubFormulas(node) {
   if (node.type === "function") {
-    const formula = `${node.name}(${node.arguments.map(getSubFormulas).join(",")})`;
-   // console.log(formula)
+    var name = `${node.name}(${node.arguments.map(getSubFormulas).join(",")})`;
+    // console.log(formula)
+    const formula = {
+      name: name,
+      depth: 0 //node.depth
+    };
     return [formula, ...node.arguments.filter((elem) => elem.type == "function").map(getSubFormulas).flat()];
   } else {
-    return node.value;
+    if(node.operand == null){
+      return node.value
+    }
+    return 0-node.operand.value;
   }
 }
 
@@ -122,6 +129,7 @@ const insertText = async () => {
       //const valuesFormulaArray = parse(valuesFormula);
       //console.log(lettersFormulaArray);
       //console.log(valuesFormulaArray);
+      console.log(valuesFormula);
       const valuesPIZDEZ = parse(valuesFormula);
       //________________________________________________
 
@@ -141,6 +149,8 @@ const insertText = async () => {
 
       var formulasValuesMap = new Map();
 
+      valuesFormulaArray[0] = valuesFormula.substring(1, valuesFormula.length);
+
       for (var i=0; i<valuesFormulaArray.length; i++) {
         const calcSheet = context.workbook.worksheets.getItem("SpecialCalculationField");
         let calcRange = calcSheet.getRange("A1");
@@ -149,10 +159,9 @@ const insertText = async () => {
         calcRange.load("text");
         await context.sync();
         const formulaObject = {
-          name: valuesFormulaArray[i],
-          depth: cur_d+1, // Здесь должно быть значение глубины, но оно пока не известно
+          name: valuesFormulaArray[i], // valuesFormulaArray[i].name
+          depth: cur_d+1, // valuesFormulaArray[i].depth // Здесь должно быть значение глубины, но оно пока не известно
           res: calcRange.text[0][0]
-          
         };
         formulasObjectsArray.push(formulaObject);
 
@@ -171,7 +180,7 @@ const insertText = async () => {
 
 
       //________________________________________________ declare dialog as global for use in later functions.
-      return(formulasValuesMap);
+      //return(formulasValuesMap);
       let dialog;
       Office.context.ui.displayDialogAsync('https://localhost:3000/taskpane.html?dialogID=15&lettersFormula=' + lettersFormula + '&valuesFormula=' + valuesFormula + '&tree=' + tree, {height: 30, width: 20},
           function (asyncResult) {

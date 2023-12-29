@@ -1,25 +1,26 @@
 import React from 'react';
+import Collapsible from 'react-collapsible';
+import cl from './ArrayComponent.module.css';
 
-const TreeNode = ({ node, depth, index }) => {
+const TreeNode = ({ node }) => {
   const nodeStyle = {
     border: node.type === 'function' ? '1px solid black' : 'none',
-    padding: '10px',
-    marginBottom: '10px',
+    padding: '5px',
+    marginBottom: '5px',
     display: 'inline-block',
-    marginLeft: `${depth * 20}px`,
-    backgroundColor: `rgba(0, 128, ${255 - depth * 30})`,
+    marginLeft: `${node.depth * 25}px`,
+    backgroundColor: `rgba(${node.depth + 16}, ${255 - node.depth + 50}, ${255 - node.depth * 30})`,
     cursor: node.type === 'function' ? 'pointer' : 'auto',
   };
 
   return (
-    <div style={nodeStyle}>
-      <p>
+    <div>
+      {/*<p>
         Name: {node.name}, Depth: {node.depth}, Result: {node.res}
+      </p>*/}
+      <p style={nodeStyle}>
+        {node.name}  &#8883;  {node.res}
       </p>
-      {node.children &&
-        node.children.map((child, i) => (
-          <TreeNode key={i} node={child} depth={depth + 1} index={i} />
-        ))}
     </div>
   );
 };
@@ -30,7 +31,7 @@ const ArrayComponent = ({ valuesFormulaArray }) => {
       <h1>Array Component</h1>
       {valuesFormulaArray.map((node, index) => (
         <div key={index}>
-          <TreeNode node={node} depth={node.depth} index={index} />
+          <TreeNode node={node} />
         </div>
       ))}
     </div>
