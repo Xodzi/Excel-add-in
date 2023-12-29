@@ -16,30 +16,38 @@ const root = createRoot(rootElement);
 
 const testArray = [
   {
-    name: 'SUM(1,2,3,4,5,6,7,AVERAGE(1,2,3,4,5,6,7),MAX(11,3,4))',
+    name: 'SUM(MAX(3,5),AVERAGE(1,2,3,4,SUM(7,7)),ABS(SUM(-7,4,1)))',
     depth: 0,
     res: '43',
   },
   {
-    name: 'AVERAGE(1,2,3,4,5,6,7)',
+    name: 'MAX(3,5)',
     depth: 1,
     res: '4',
   },
   {
-    name: 'MAX(11,3,4))',
+    name: 'AVERAGE(1,2,3,4,SUM(7,7))',
     depth: 1,
+    res: '4',
+  },
+  {
+    name: 'SUM(7,7)',
+    depth: 2,
+    res: '4',
+  },
+  {
+    name: 'ABS(SUM(-7,4,1))',
+    depth: 1,
+    res: '1',
+  },
+  {
+    name: 'SUM(-7,4,1)',
+    depth: 2,
     res: '1',
   }
 ];
 
-
-//var testFormula = "SUM(SUM(1,2),ABS(4),3,AVERAGE(MAX(8,1,5),SUM(4,3,7)))"; // incorrect (ignore free number for sum)
-//var testFormula = "MAX(1,2,3,0,0,0,4,5,9)"; // incorrect (Cannot read properties of null (reading 'arguments'))
-//var testFormula = "SUM(1,2,3)"; // incorrect (Cannot read properties of null (reading 'arguments'))
-var testFormula = "SUM(MAX(10,3,0,2),SUM(15,3),ABS(6))"; // correct
-//var testFormula = "MAX(SUM(9,4,5),5,AVERAGE(2,3),6)"; // incorrect (ignore '5' and '6', like first algos)
-
-
+// for first and second trees
 const tree = parse("SUM(SUM(1,2),ABS(4),3,AVERAGE(MAX(8,1,5),SUM(4,3,7)))");
 console.log(tree);
 
@@ -49,7 +57,10 @@ function getSubFormulas(node) {
    // console.log(formula)
     return [formula, ...node.arguments.filter((elem) => elem.type == "function").map(getSubFormulas).flat()];
   } else {
-    return node.value;
+    if(node.operand == null){
+      return node.value
+    }
+    return 0-node.operand.value;
   }
 }
 
@@ -76,7 +87,7 @@ function traverseTree(node, depth = 0) {
 }
 
 
-/*var cur_par = tree;
+
 /* Render application after Office initializes */
 Office.onReady(() => {
 
@@ -85,7 +96,7 @@ Office.onReady(() => {
       <App title={title} />
       <Tree tree={tree} />
       <TreeComponent tree={tree} />
-      <ArrayComponent valuesFormulaArray={testArray}></ArrayComponent>
+      {/*<ArrayComponent valuesFormulaArray={testArray}></ArrayComponent>*/}
       </div>
   );
 });
