@@ -188,11 +188,24 @@ const insertText = async () => {
       //return(formulasValuesMap);
       let dialog;
       Office.context.ui.displayDialogAsync('https://localhost:3000/taskpane.html?dialogID=15&lettersFormula=' + lettersFormula + '&valuesFormula=' + valuesFormula, {height: 30, width: 20},
-          function (asyncResult) {
-              dialog = asyncResult.value;
-              dialog.addEventHandler(Office.EventType.DialogMessageReceived, processMessage);
-          }
-      )
+      function (asyncResult) {
+        dialog = asyncResult.value;
+        dialog.addEventHandler(Office.EventType.DialogMessageReceived, processMessage);
+      }
+      );
+      function processMessage(arg) {
+        dialog.close();
+        // message processing code goes here;
+      }
+      function sheetPropertiesChanged() {
+        const messageToDialog = JSON.stringify({
+                                   name: "My Sheet",
+                                   position: 2
+                               });
+    
+        dialog.messageChild(messageToDialog);
+    }
+    
       //________________________________________________
     });
   } catch (error) {

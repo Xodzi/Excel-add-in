@@ -1,3 +1,4 @@
+/* global Excel console */
 import React from 'react';
 
 const TreeNode = ({ node, depth }) => (

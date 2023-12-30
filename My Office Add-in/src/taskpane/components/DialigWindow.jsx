@@ -1,47 +1,37 @@
+/* global Excel console */
 import React, { useState } from 'react'
 import {parse, visit} from 'excel-formula-parser';
+import ArrayComponent from './ArrayComponent';
 //import to_array from '../office-document'
 
 
 
 export default function DialigWindow(props) {
 
+  const treeData = JSON.parse(localStorage.getItem('arrayData'));
+  console.log(treeData)
 
+  let dialog;
 
-  //var lettersParts = props.lettersFormula.match(/[^();]+|\([^()]*\)/g);
-
-  //var valuesParts = props.valuesFormula.match(/[^();]+|\([^()]*\)/g);
-
-  /*const options = {
-    licenseKey: 'gpl-v3',
-    dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'],
-    timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
-    currencySymbol: ['$', 'USD'],
-    localeLang: 'en-US',
-    functionArgSeparator: ',', // set by default
-    decimalSeparator: '.', // set by default
-    thousandSeparator: '', // set by default
-    arrayColumnSeparator: ',', // set by default
-    arrayRowSeparator: ';', // set by default
-    nullYear: 30, // set by default
-    caseSensitive: false, // set by default
-    accentSensitive: true,
-    ignorePunctuation: false, // set by default
-    useWildcards: true, // set by default
-    useRegularExpressions: false, // set by default
-    matchWholeCell: true, // set by default
-    useArrayArithmetic: true,
-    ignoreWhiteSpace: 'any',
-    evaluateNullToZero: true,
-    leapYear1900: true,
-    nullDate: { year: 1899, month: 12, day: 31 },
-    smartRounding: true, // set by default
-  };*/
-
-  // Выводим результат
-  //for (var i = 0; i < parts.length; i++) {
-  //  console.log("Часть " + (i + 1) + ":", parts[i]);
-  //}
+  Office.onReady(function (info) {
+      if (info.host === Office.HostType.Excel) {
+          // Register event handler for DialogMessageReceived
+          Office.EventType.DialogMessageReceived = "dialogMessageReceived";
+          
+          // Get the current dialog
+          Office.context.ui.getParentContext(function (result) {
+              dialog = result.value;
+              
+              // Add event handler for DialogMessageReceived
+              dialog.addEventHandler(Office.EventType.DialogMessageReceived, function (arg) {
+                  var jsonString = arg.message; // Get the JSON string
+                  var jsonObject = JSON.parse(jsonString); // Parse it into an object
+                  console.log(jsonObject);
+              });
+          });
+      }
+  });
+  
 
   return (
     <div>
@@ -50,6 +40,7 @@ export default function DialigWindow(props) {
       <div>urlQuery: {props.formula}</div>
       <div>Letters Formula: {props.lettersFormula}</div>
       <div>Values Formula: {props.valuesFormula}</div>
+      <ArrayComponent valuesFormulaArray={[]} />
      
     </div>
   )
