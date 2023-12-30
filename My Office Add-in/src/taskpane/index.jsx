@@ -94,9 +94,9 @@ Office.onReady(() => {
   root.render(
     <div>
       <App title={title} />
-      <Tree tree={tree} />
+      {/*<Tree tree={tree} />
       <TreeComponent tree={tree} />
-      {/*<ArrayComponent valuesFormulaArray={testArray}></ArrayComponent>*/}
+      <ArrayComponent valuesFormulaArray={testArray}></ArrayComponent>*/}
       </div>
   );
 });

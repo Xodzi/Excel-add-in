@@ -21,26 +21,24 @@ const useStyles = makeStyles({
     marginBottom: "20px",
     marginRight: "20px",
     maxWidth: "50%",
-  },
+  }
 });
 
 //-------------------------------------------------------------------
 // add localStorage get into testArray
 //-------------------------------------------------------------------
 
-
 const TextInsertion = () => {
   const [text, setText] = useState("Some text.");
 
-  const [array,SetArray] = useState([])
-
+  const [array,SetArray] = useState([]);  
 
   async function handleTextInsertion() {
     let test = await insertText();
     console.log(test);
     const treeData = JSON.parse(localStorage.getItem('arrayData'));
-    console.log(treeData)
-    console.log("SetArray")
+    console.log(treeData);
+    console.log("SetArray");
     SetArray(treeData);
   };
 
@@ -54,9 +52,9 @@ const TextInsertion = () => {
   return (
     <div className={styles.textPromptAndInsertion}>
       <Field className={styles.instructions}>Click the button to create formula tree.</Field>
-      <Button appearance="primary" disabled={false} size="large" onClick={handleTextInsertion}>
+      <button onClick={handleTextInsertion}>
         Create tree
-      </Button>
+      </button>
       <ArrayComponent valuesFormulaArray={array}></ArrayComponent>
     </div>
   );

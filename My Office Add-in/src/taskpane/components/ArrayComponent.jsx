@@ -9,8 +9,9 @@ const TreeNode = ({ node }) => {
     marginBottom: '5px',
     display: 'inline-block',
     marginLeft: `${node.depth * 25}px`,
-    backgroundColor: `rgba(${node.depth + 16}, ${255 - node.depth + 50}, ${255 - node.depth * 30})`,
+    backgroundColor: node.depth % 2 === 0 ? `rgba(255, ${node.depth * 50}, ${node.depth * 50}, 0.7)` : `rgba(225, ${node.depth * 50}, ${node.depth * 50}, 0.7)`,
     cursor: node.type === 'function' ? 'pointer' : 'auto',
+    
   };
 
   return (
@@ -18,9 +19,9 @@ const TreeNode = ({ node }) => {
       {/*<p>
         Name: {node.name}, Depth: {node.depth}, Result: {node.res}
       </p>*/}
-      <p style={nodeStyle}>
-        {node.name}  &#8883;  {node.res}
-      </p>
+      <div style={nodeStyle}>
+        {node.name}  &#8883;  <strong>{node.res}</strong>
+      </div>
     </div>
   );
 };
@@ -28,7 +29,7 @@ const TreeNode = ({ node }) => {
 const ArrayComponent = ({ valuesFormulaArray }) => {
   return (
     <div>
-      <h1>Array Component</h1>
+      <h3>Array Component</h3>
       {valuesFormulaArray.map((node, index) => (
         <div key={index}>
           <TreeNode node={node} />

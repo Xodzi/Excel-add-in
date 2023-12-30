@@ -176,6 +176,7 @@ const insertText = async () => {
       }
 
       var jsonString = JSON.stringify(formulasObjectsArray);
+      console.log(jsonString);
       await localStorage.setItem('arrayData', JSON.stringify(formulasObjectsArray));
       console.log("обновили")
 
@@ -187,31 +188,18 @@ const insertText = async () => {
       //________________________________________________ declare dialog as global for use in later functions.
       //return(formulasValuesMap);
       let dialog;
-      Office.context.ui.displayDialogAsync('https://localhost:3000/taskpane.html?dialogID=15&lettersFormula=' + lettersFormula + '&valuesFormula=' + valuesFormula, {height: 30, width: 20},
-      function (asyncResult) {
-        dialog = asyncResult.value;
-        dialog.addEventHandler(Office.EventType.DialogMessageReceived, processMessage);
-      }
-      );
-      function processMessage(arg) {
-        dialog.close();
-        // message processing code goes here;
-      }
-      function sheetPropertiesChanged() {
-        const messageToDialog = JSON.stringify({
-                                   name: "My Sheet",
-                                   position: 2
-                               });
-    
-        dialog.messageChild(messageToDialog);
-    }
-    
+      Office.context.ui.displayDialogAsync('https://localhost:3000/taskpane.html?dialogID=15&lettersFormula=' + lettersFormula + '&valuesFormula=' + valuesFormula + '&jsonString=' + jsonString, {height: 50, width: 20},
+          function (asyncResult) {
+              dialog = asyncResult.value;
+              dialog.addEventHandler(Office.EventType.DialogMessageReceived, processMessage);
+          }
+      )
       //________________________________________________
     });
   } catch (error) {
     console.log("Error: " + error);
   }
-  return "Залупа"
+
 };
 //------------------------------------------------
 
