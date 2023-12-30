@@ -28,19 +28,17 @@ const useStyles = makeStyles({
 // add localStorage get into testArray
 //-------------------------------------------------------------------
 
-
 const TextInsertion = () => {
   const [text, setText] = useState("Some text.");
 
-  const [array,SetArray] = useState([])
-
+  const [array,SetArray] = useState([]);  
 
   async function handleTextInsertion() {
     let test = await insertText();
     console.log(test);
     const treeData = JSON.parse(localStorage.getItem('arrayData'));
-    console.log(treeData)
-    console.log("SetArray")
+    console.log(treeData);
+    console.log("SetArray");
     SetArray(treeData);
   };
 

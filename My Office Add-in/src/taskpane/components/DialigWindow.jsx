@@ -1,12 +1,32 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import queryString from 'query-string';
 import {parse, visit} from 'excel-formula-parser';
+import ArrayComponent from "../components/ArrayComponent";
+import { Button } from 'react-bootstrap';
 //import to_array from '../office-document'
 
-
+// need npm install query-string
 
 export default function DialigWindow(props) {
 
+  const [array,SetArray] = useState([]);
 
+  console.log("check after");
+
+  useEffect(() => {
+    // Получение параметра jsonString из URL
+    const { jsonString } = queryString.parse(window.location.search);
+
+    if (jsonString) {
+      // Преобразование JSON-строки в массив и установка состояния
+      const formulasObjectsArray = JSON.parse(jsonString);
+      SetArray(formulasObjectsArray);
+    }
+  }, []);
+
+  console.log("check before");
+
+  console.log(array);
 
   //var lettersParts = props.lettersFormula.match(/[^();]+|\([^()]*\)/g);
 
@@ -46,11 +66,9 @@ export default function DialigWindow(props) {
   return (
     <div>
       <div>DialogWindow</div>
-      <div>DialogID: {props.dialogID}</div>
-      <div>urlQuery: {props.formula}</div>
-      <div>Letters Formula: {props.lettersFormula}</div>
-      <div>Values Formula: {props.valuesFormula}</div>
-     
+      <div>Primal Formula: {props.lettersFormula}</div>
+      <div>Transform Formula: {props.valuesFormula}</div>
+      <ArrayComponent valuesFormulaArray={array}></ArrayComponent>
     </div>
   )
 }

@@ -38,7 +38,7 @@ const App = (props) => {
     
     <div className={styles.root}>
       {/* I'm a dialog window */ urlQueryParameters.get("dialogID") != null && <React.Fragment>
-        <DialigWindow dialogID={urlQueryParameters.get("dialogID")} lettersFormula = {urlQueryParameters.get("lettersFormula")} valuesFormula = {urlQueryParameters.get("valuesFormula")} tree = {urlQueryParameters.get("tree")}/>
+        <DialigWindow dialogID={urlQueryParameters.get("dialogID")} lettersFormula = {urlQueryParameters.get("lettersFormula")} valuesFormula = {urlQueryParameters.get("valuesFormula")} jsonString = {urlQueryParameters.get("jsonString")}/>
             </React.Fragment>}
       {/* I'm NOT a dialog window (I'm the main taskpane ui) */ urlQueryParameters.get("dialogID") == null &&<React.Fragment>
         <HeroList message="Discover what this add-in can do for you today!" items={listItems} />

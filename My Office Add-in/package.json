@@ -38,6 +38,7 @@
     "fast-formula-parser": "^1.0.19",
     "formulajs": "^1.0.8",
     "hyperformula": "^2.6.0",
+    "query-string": "^8.1.0",
     "react": "^18.2.0",
     "react-accessible-treeview": "^2.8.1",
     "react-bootstrap": "^2.9.1",
