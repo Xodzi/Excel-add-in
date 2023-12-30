@@ -21,7 +21,7 @@ const useStyles = makeStyles({
     marginBottom: "20px",
     marginRight: "20px",
     maxWidth: "50%",
-  },
+  }
 });
 
 //-------------------------------------------------------------------
@@ -52,9 +52,9 @@ const TextInsertion = () => {
   return (
     <div className={styles.textPromptAndInsertion}>
       <Field className={styles.instructions}>Click the button to create formula tree.</Field>
-      <Button appearance="primary" disabled={false} size="large" onClick={handleTextInsertion}>
+      <button onClick={handleTextInsertion}>
         Create tree
-      </Button>
+      </button>
       <ArrayComponent valuesFormulaArray={array}></ArrayComponent>
     </div>
   );

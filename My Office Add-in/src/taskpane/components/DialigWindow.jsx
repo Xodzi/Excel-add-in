@@ -65,9 +65,9 @@ export default function DialigWindow(props) {
 
   return (
     <div>
-      <div>DialogWindow</div>
-      <div>Primal Formula: {props.lettersFormula}</div>
-      <div>Transform Formula: {props.valuesFormula}</div>
+      <div><strong>Выбранная формула:  </strong>{props.lettersFormula}</div>
+      <div><strong>Формула с подставленными значениями:  </strong>{props.valuesFormula}</div>
+      <h2>Дерево функции</h2>
       <ArrayComponent valuesFormulaArray={array}></ArrayComponent>
     </div>
   )
