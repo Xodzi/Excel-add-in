@@ -152,9 +152,9 @@ const insertText = async () => {
       for (var i = 0; i < cells.length; i++) {
         const sheet = context.workbook.worksheets.getActiveWorksheet();
         var valuesRange = sheet.getRange(cells[i]);
-        valuesRange.load("formulas");
+        //valuesRange.load("formulas");
         valuesRange.load("values");
-        valuesRange.load("text");
+        //valuesRange.load("text");
         console.log(valuesRange)
         await context.sync();
         if (valuesRange.values[0][0] == "") cellsMap.set(cells[i], 0);
@@ -176,17 +176,17 @@ const insertText = async () => {
       //________________________________________________ create arrays with split formulas (сначала надо довести до ума функцию, которая сплитует нашу строку)
 
       console.log(valuesFormula);
-      const valuesPIZDEZ = parse(valuesFormula);
+      const parseTree = parse(valuesFormula);
 
-      setDepth(valuesPIZDEZ,0);
+      setDepth(parseTree,0);
       //________________________________________________
 
 
       //________________________________________________ create array with pieces formulas and calculate their values
       // example of ideal formula split (здесь должна использоваться именно valuesFormulaArray, потому что по ней ведутся дальнейшие вычисления и создание formulasValuesMap)
       //var valuesFormulaArray = ["SUM(SUM(1,2),ABS(4),3,AVERAGE(MAX(8,1,5),SUM(4,3,7)))", "SUM(1,2)", "ABS(4)", "3", "AVERAGE(MAX(8,1,5),SUM(4,3,7))", "MAX(8,1,5)", "SUM(4,3,7)"];
-      //var valuesFormulaArray = getSubFormulas(valuesPIZDEZ);
-      var valuesFormulaArray = walkTree(valuesPIZDEZ);
+      //var valuesFormulaArray = getSubFormulas(parseTree);
+      var valuesFormulaArray = walkTree(parseTree);
       console.log(valuesFormulaArray);
  
 
@@ -222,7 +222,7 @@ const insertText = async () => {
       }
 
       var jsonString = JSON.stringify(formulasObjectsArray);
-      console.log(JSON.stringify(valuesPIZDEZ))
+      console.log(JSON.stringify(parseTree))
       console.log(jsonString);
       await localStorage.setItem('arrayData', JSON.stringify(formulasObjectsArray));
       console.log("обновили")
