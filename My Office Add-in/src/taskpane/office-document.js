@@ -103,6 +103,7 @@ const insertText = async () => {
       let range = context.workbook.getSelectedRange();
       range.load("formulas");
       await context.sync();
+      //console.log(range.formulas[0][0]);
       var lettersFormula = convertRanges(range.formulas[0][0]); // Take cells formula like a string
 
       //________________________________________________ convert string formula to formula with numbers
