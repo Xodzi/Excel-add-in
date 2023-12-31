@@ -67,7 +67,35 @@ function getSubFormulas(node) {
     return { name: temp_name };
   }
 }
+const getFormula = (node) => {
+  if (node.type === "function") {
+    if (node.arguments) {
+      return node.name + "(" + node.arguments.map(getFormula).join(",") + ")";
+    } 
+    return node.name + "()";
+  } else {
+    if (node.operator == "-") {
+      return -node.operand.value;
+    }
+    else{
+      return node.value;
+    }
+  } 
+  return node.value;
+};
 
+const walkTree = (node, output=[], depth=0) => {
+  if (node.type === "function") {
+    output.push({
+      name: getFormula(node),
+      depth
+    });
+    if (node.arguments) {
+      node.arguments.forEach(arg => walkTree(arg, output, depth + 1));
+    }
+  }
+  return output;
+};
 
 
 
@@ -107,20 +135,29 @@ const insertText = async () => {
       
       let range = context.workbook.getSelectedRange();
       range.load("formulas");
+      console.log(range)
+     // console.log(range.m_formulas)
       await context.sync();
       var lettersFormula = convertRanges(range.formulas[0][0]); // Take cells formula like a string
+
+      console.log(lettersFormula)
 
       //________________________________________________ convert string formula to formula with numbers
       var cells = lettersFormula.match(/[A-Za-z]+\d+/g);
       var cellsMap = new Map();
 
+      console.log(cells)
+
       for (var i = 0; i < cells.length; i++) {
         const sheet = context.workbook.worksheets.getActiveWorksheet();
         var valuesRange = sheet.getRange(cells[i]);
+        valuesRange.load("formulas");
+        valuesRange.load("values");
         valuesRange.load("text");
+        console.log(valuesRange)
         await context.sync();
-        if (valuesRange.text[0][0] == "") cellsMap.set(cells[i], 0);
-        else cellsMap.set(cells[i], valuesRange.text[0][0]);
+        if (valuesRange.values[0][0] == "") cellsMap.set(cells[i], 0);
+        else cellsMap.set(cells[i], valuesRange.values[0][0]);
       }
 
       // replace cells names in formula
@@ -130,32 +167,6 @@ const insertText = async () => {
         valuesFormula = valuesFormula.replace(regex, value);
       }); 
 
-      const getFormula = (node) => {
-        if (node.type === "function") {
-          if (node.arguments) {
-            return node.name + "(" + node.arguments.map(getFormula).join(",") + ")";
-          } 
-          return node.name + "()";
-        } else if (node.type === "unary-expression") {
-          if (node.operator === "-") {
-            return -node.operand.value;
-          }
-        } 
-        return node.value;
-      };
-      
-      const walkTree = (node, output=[], depth=0) => {
-        if (node.type === "function") {
-          output.push({
-            name: getFormula(node),
-            depth
-          });
-          if (node.arguments) {
-            node.arguments.forEach(arg => walkTree(arg, output, depth + 1));
-          }
-        }
-        return output;
-      };
       
       
       //________________________________________________
@@ -188,10 +199,8 @@ const insertText = async () => {
 
       var formulasValuesMap = new Map();
 
-      valuesFormulaArray[0] = {
-        name : valuesFormula.substring(1, valuesFormula.length),
-        depth : 0
-      };
+      console.log(valuesFormulaArray)
+
 
       for (var i=0; i<valuesFormulaArray.length; i++) {
         const calcSheet = context.workbook.worksheets.getItem("SpecialCalculationField");
