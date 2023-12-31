@@ -37,19 +37,22 @@ function createCellName(row, column) {
 function getSubFormulas(node) {
   if (node.type === "function") {
     var args = node.arguments.map(arg => {
-   //   console.log(arg)
       if (arg.arguments) {
-        // Если аргумент - это массив, извлекаем свойство name из каждого элемента
-     //   console.log(arg.arguments.map(subArg => getSubFormulas(subArg).name).join(","))
-        return arg.name +"(" +arg.arguments.map(subArg => getSubFormulas(subArg).name).join(",") + ")";
+        // If the argument is an array, extract the name property from each element
+        return arg.name + "(" + arg.arguments.map(subArg => getSubFormulas(subArg).name).join(",") + ")";
       } else {
-        // Если аргумент не является массивом, извлекаем свойство name
+        // If the argument is not an array, extract the name property
         return getSubFormulas(arg).name;
       }
     }).join(",");
-    
+
     var name = `${node.name}(${args})`;
-   // console.log(name);
+
+    if (args === "") {
+      // Handle the case where there are no arguments
+      name = `${node.name}()`;
+    }
+
     const formula = {
       name: name,
       depth: node.depth
@@ -58,12 +61,42 @@ function getSubFormulas(node) {
   } else {
     if (node.operand == null) {
       let temp_name = node.value;
-      return {name: temp_name}
+      return { name: temp_name };
     }
     let temp_name = 0 - node.operand.value;
-    return {name : temp_name}
+    return { name: temp_name };
   }
 }
+const getFormula = (node) => {
+  if (node.type === "function") {
+    if (node.arguments) {
+      return node.name + "(" + node.arguments.map(getFormula).join(",") + ")";
+    } 
+    return node.name + "()";
+  } else {
+    if (node.operator == "-") {
+      return -node.operand.value;
+    }
+    else{
+      return node.value;
+    }
+  } 
+  return node.value;
+};
+
+const walkTree = (node, output=[], depth=0) => {
+  if (node.type === "function") {
+    output.push({
+      name: getFormula(node),
+      depth
+    });
+    if (node.arguments) {
+      node.arguments.forEach(arg => walkTree(arg, output, depth + 1));
+    }
+  }
+  return output;
+};
+
 
 
 
@@ -102,21 +135,30 @@ const insertText = async () => {
       
       let range = context.workbook.getSelectedRange();
       range.load("formulas");
+      console.log(range)
+     // console.log(range.m_formulas)
       await context.sync();
       //console.log(range.formulas[0][0]);
       var lettersFormula = convertRanges(range.formulas[0][0]); // Take cells formula like a string
+
+      console.log(lettersFormula)
 
       //________________________________________________ convert string formula to formula with numbers
       var cells = lettersFormula.match(/[A-Za-z]+\d+/g);
       var cellsMap = new Map();
 
+      console.log(cells)
+
       for (var i = 0; i < cells.length; i++) {
         const sheet = context.workbook.worksheets.getActiveWorksheet();
         var valuesRange = sheet.getRange(cells[i]);
+        valuesRange.load("formulas");
+        valuesRange.load("values");
         valuesRange.load("text");
+        console.log(valuesRange)
         await context.sync();
-        if (valuesRange.text[0][0] == "") cellsMap.set(cells[i], 0);
-        else cellsMap.set(cells[i], valuesRange.text[0][0]);
+        if (valuesRange.values[0][0] == "") cellsMap.set(cells[i], 0);
+        else cellsMap.set(cells[i], valuesRange.values[0][0]);
       }
 
       // replace cells names in formula
@@ -125,6 +167,8 @@ const insertText = async () => {
         const regex = new RegExp(key, 'g');
         valuesFormula = valuesFormula.replace(regex, value);
       }); 
+
+      
       
       //________________________________________________
 
@@ -141,7 +185,10 @@ const insertText = async () => {
       //________________________________________________ create array with pieces formulas and calculate their values
       // example of ideal formula split (здесь должна использоваться именно valuesFormulaArray, потому что по ней ведутся дальнейшие вычисления и создание formulasValuesMap)
       //var valuesFormulaArray = ["SUM(SUM(1,2),ABS(4),3,AVERAGE(MAX(8,1,5),SUM(4,3,7)))", "SUM(1,2)", "ABS(4)", "3", "AVERAGE(MAX(8,1,5),SUM(4,3,7))", "MAX(8,1,5)", "SUM(4,3,7)"];
-      var valuesFormulaArray = getSubFormulas(valuesPIZDEZ);
+      //var valuesFormulaArray = getSubFormulas(valuesPIZDEZ);
+      var valuesFormulaArray = walkTree(valuesPIZDEZ);
+      console.log(valuesFormulaArray);
+ 
 
       context.workbook.worksheets.getItemOrNullObject("SpecialCalculationField").delete(); // delete old calculation field
 
@@ -153,10 +200,8 @@ const insertText = async () => {
 
       var formulasValuesMap = new Map();
 
-      valuesFormulaArray[0] = {
-        name : valuesFormula.substring(1, valuesFormula.length),
-        depth : 0
-      };
+      console.log(valuesFormulaArray)
+
 
       for (var i=0; i<valuesFormulaArray.length; i++) {
         const calcSheet = context.workbook.worksheets.getItem("SpecialCalculationField");
@@ -177,9 +222,11 @@ const insertText = async () => {
       }
 
       var jsonString = JSON.stringify(formulasObjectsArray);
+      console.log(JSON.stringify(valuesPIZDEZ))
       console.log(jsonString);
       await localStorage.setItem('arrayData', JSON.stringify(formulasObjectsArray));
       console.log("обновили")
+
 
       context.workbook.worksheets.getItemOrNullObject("SpecialCalculationField").delete(); // delete new calculation field
       await context.sync();
