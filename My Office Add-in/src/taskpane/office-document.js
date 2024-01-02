@@ -80,7 +80,7 @@ const getFormula = (node) => {
     else{
       return node.value;
     }
-  } 
+  }
   return node.value;
 };
 
@@ -118,10 +118,6 @@ function setDepth(node, depth) {
 
 
 
-
-
-
-
 //------------------------------------------------
 
 //var valuesFormulaArray = ["SUM(SUM(1,2),ABS(4),3,AVERAGE(MAX(8,1,5),SUM(4,3,7)))", "SUM(1,2)", "ABS(4)", "3", "AVERAGE(MAX(8,1,5),SUM(4,3,7))", "MAX(8,1,5)", "SUM(4,3,7)"];
@@ -139,7 +135,13 @@ const insertText = async () => {
      // console.log(range.m_formulas)
       await context.sync();
       //console.log(range.formulas[0][0]);
-      var lettersFormula = convertRanges(range.formulas[0][0]); // Take cells formula like a string
+
+      // Заменяем последовательности "-" согласно вашим правилам
+      var withoutMinusString = range.formulas[0][0].replace(/(-{2,})/g, function(match, p1) {
+          return p1.length % 2 === 0 ? '' : '-';
+      });
+
+      var lettersFormula = convertRanges(withoutMinusString); // Take cells formula like a string
 
       console.log(lettersFormula)
 
@@ -177,6 +179,7 @@ const insertText = async () => {
 
       console.log(valuesFormula);
       const parseTree = parse(valuesFormula);
+      console.log(parseTree);
 
       setDepth(parseTree,0);
       //________________________________________________
@@ -236,7 +239,7 @@ const insertText = async () => {
       //________________________________________________ declare dialog as global for use in later functions.
       //return(formulasValuesMap);
       let dialog;
-      Office.context.ui.displayDialogAsync('https://localhost:3000/taskpane.html?dialogID=15&lettersFormula=' + lettersFormula + '&valuesFormula=' + valuesFormula + '&jsonString=' + jsonString, {height: 50, width: 20},
+      Office.context.ui.displayDialogAsync('https://localhost:3000/taskpane.html?dialogID=15&lettersFormula=' + lettersFormula + '&valuesFormula=' + valuesFormula + '&jsonString=' + jsonString, {height: 45, width: 50},
           function (asyncResult) {
               dialog = asyncResult.value;
               dialog.addEventHandler(Office.EventType.DialogMessageReceived, processMessage);

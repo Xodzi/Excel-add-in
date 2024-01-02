@@ -1,6 +1,5 @@
 import React from 'react';
 import Collapsible from 'react-collapsible';
-import cl from './ArrayComponent.module.css';
 
 const TreeNode = ({ node }) => {
   const nodeStyle = {
@@ -16,9 +15,6 @@ const TreeNode = ({ node }) => {
 
   return (
     <div>
-      {/*<p>
-        Name: {node.name}, Depth: {node.depth}, Result: {node.res}
-      </p>*/}
       <div style={nodeStyle}>
         {node.name}  &#8883;  <strong>{node.res}</strong>
       </div>
@@ -29,7 +25,6 @@ const TreeNode = ({ node }) => {
 const ArrayComponent = ({ valuesFormulaArray }) => {
   return (
     <div>
-      <h3>Array Component</h3>
       {valuesFormulaArray.map((node, index) => (
         <div key={index}>
           <TreeNode node={node} />

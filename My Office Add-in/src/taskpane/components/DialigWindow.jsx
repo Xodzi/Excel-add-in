@@ -3,15 +3,18 @@ import queryString from 'query-string';
 import {parse, visit} from 'excel-formula-parser';
 import ArrayComponent from "../components/ArrayComponent";
 import { Button } from 'react-bootstrap';
-//import to_array from '../office-document'
-
-// need npm install query-string
 
 export default function DialigWindow(props) {
 
+  // add some styles for Dialog window
+  const bodyStyle = {fontSize: "16px"};
+  const block = {marginBottom: "15px"};
+  const hedlineStyle = {fontSize: "120%", fontWeight: "bold"};
+  const treeHedlineStyle = {fontSize: "140%", fontWeight: "bold"};
+
   const [array,SetArray] = useState([]);
 
-  console.log("check after");
+  //console.log("check after");
 
   useEffect(() => {
     // Получение параметра jsonString из URL
@@ -25,9 +28,9 @@ export default function DialigWindow(props) {
     }
   }, []);
 
-  console.log("check before");
+  //console.log("check before");
 
-  console.log(array);
+  //console.log(array);
 
   //var lettersParts = props.lettersFormula.match(/[^();]+|\([^()]*\)/g);
 
@@ -65,11 +68,23 @@ export default function DialigWindow(props) {
   //}
 
   return (
-    <div>
-      <div><strong>Выбранная формула:  </strong>{props.lettersFormula}</div>
-      <div><strong>Формула с подставленными значениями:  </strong>{props.valuesFormula}</div>
-      <h2>Дерево функции</h2>
-      <ArrayComponent valuesFormulaArray={array}></ArrayComponent>
+    <div style={bodyStyle}>
+
+      <div style={block}>
+        <div style={hedlineStyle}>Выбранная формула:</div>
+        <div>{props.lettersFormula}</div>
+      </div>
+
+      <div style={block}>
+        <div style={hedlineStyle}>Формула с подставленными значениями:</div>
+        <div>{props.valuesFormula}</div>
+      </div>
+
+      <div style={block}>
+        <div style={treeHedlineStyle}>Дерево функции</div>
+        <ArrayComponent valuesFormulaArray={array}></ArrayComponent>
+      </div>
+
     </div>
   )
 }

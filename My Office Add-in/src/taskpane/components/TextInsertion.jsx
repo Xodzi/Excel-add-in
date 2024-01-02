@@ -28,26 +28,20 @@ const useStyles = makeStyles({
 // add localStorage get into testArray
 //-------------------------------------------------------------------
 
-const TextInsertion = () => {
-  const [text, setText] = useState("Some text.");
+const TextInsertion = (event) => {
 
-  const [array,SetArray] = useState([]);  
+  //const [array,SetArray] = useState([]);
 
   async function handleTextInsertion() {
     let test = await insertText();
     console.log(test);
-    const treeData = JSON.parse(localStorage.getItem('arrayData'));
+    {/*const treeData = JSON.parse(localStorage.getItem('arrayData'));
     console.log(treeData);
     console.log("SetArray");
-    SetArray(treeData);
-  };
-
-  const handleTextChange = async (event) => {
-    setText(event.target.value);
+    SetArray(treeData);*/}
   };
 
   const styles = useStyles();
-
 
   return (
     <div className={styles.textPromptAndInsertion}>
@@ -55,7 +49,7 @@ const TextInsertion = () => {
       <button onClick={handleTextInsertion}>
         Create tree
       </button>
-      <ArrayComponent valuesFormulaArray={array}></ArrayComponent>
+      {/*<ArrayComponent valuesFormulaArray={array}></ArrayComponent>*/}
     </div>
   );
 };
