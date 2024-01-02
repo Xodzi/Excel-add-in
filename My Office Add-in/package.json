@@ -1,5 +1,6 @@
 {
   "name": "office-addin-taskpane-react-js",
+  "homepage": "https://github.com/Xodzi/Excel-add-in",
   "version": "0.0.1",
   "repository": {
     "type": "git",
@@ -14,6 +15,8 @@
   "scripts": {
     "build": "webpack --mode production",
     "build:dev": "webpack --mode development",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "dev-server": "webpack serve --mode development",
     "lint": "office-addin-lint check",
     "lint:fix": "office-addin-lint fix",
@@ -37,6 +40,7 @@
     "excel-formula-parser": "^1.1.0",
     "fast-formula-parser": "^1.0.19",
     "formulajs": "^1.0.8",
+    "gh-pages": "^6.1.1",
     "hyperformula": "^2.6.0",
     "query-string": "^8.1.0",
     "react": "^18.2.0",
