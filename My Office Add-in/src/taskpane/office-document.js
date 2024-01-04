@@ -2,14 +2,18 @@ import {parse, visit} from 'excel-formula-parser';
 
 /* global Excel console */
 
-// functions for ranges convert to values arrays
+
+
+// this part of code convert ranges to values arrays
 //------------------------------------------------
+// MY COMMENT
 function convertRanges(formula) {
   return formula.replace(/([A-Z]+\d+):([A-Z]+\d+)/g, function(match, start, end) {
       return createArrayFromRange(start, end);
   });
 }
 
+//MY COMMENT
 function createArrayFromRange(start, end) {
   var startCell = parseCell(start);
   var endCell = parseCell(end);
@@ -24,16 +28,24 @@ function createArrayFromRange(start, end) {
   return array.join(',');
 }
 
+// MY COMMENT
 function parseCell(cell) {
   var column = cell.match(/[A-Z]+/)[0];
   var row = parseInt(cell.match(/\d+/)[0]);
   return { column: column, row: row };
 }
 
+// MY COMMENT
 function createCellName(row, column) {
   return column + row;
 }
+//------------------------------------------------
 
+
+
+// this part of code convert parse tree to array
+//------------------------------------------------
+// YOUR COMMENT
 function getSubFormulas(node) {
   if (node.type === "function") {
     var args = node.arguments.map(arg => {
@@ -67,6 +79,8 @@ function getSubFormulas(node) {
     return { name: temp_name };
   }
 }
+
+// YOUR COMMENT
 const getFormula = (node) => {
   if (node.type === "function") {
     if (node.arguments) {
@@ -84,6 +98,7 @@ const getFormula = (node) => {
   return node.value;
 };
 
+// YOUR COMMENT
 const walkTree = (node, output=[], depth=0) => {
   if (node.type === "function") {
     output.push({
@@ -98,13 +113,7 @@ const walkTree = (node, output=[], depth=0) => {
 };
 
 
-
-
-//------------------------------------------------
-
-
-// function for set depth in tree
-//------------------------------------------------
+// function for set tree elements depth
 function setDepth(node, depth) {
   if (node.type === "function" && node.arguments.length > 0) {
     node.depth = depth;
@@ -112,10 +121,9 @@ function setDepth(node, depth) {
   } else {
     node.depth = depth;
   }
-}
+};
 //------------------------------------------------
 
-//var valuesFormulaArray = ["SUM(SUM(1,2),ABS(4),3,AVERAGE(MAX(8,1,5),SUM(4,3,7)))", "SUM(1,2)", "ABS(4)", "3", "AVERAGE(MAX(8,1,5),SUM(4,3,7))", "MAX(8,1,5)", "SUM(4,3,7)"];
 
 
 // main function
@@ -163,7 +171,7 @@ const insertText = async () => {
       */
 
 
-      // Заменяем последовательности "-"
+      // replace strings with "-"
       var withoutMinusString = range.formulas[0][0].replace(/(-{2,})/g, function(match, p1) {
           return p1.length % 2 === 0 ? '' : '-';
       });
