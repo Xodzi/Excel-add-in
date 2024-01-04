@@ -103,10 +103,8 @@ const walkTree = (node, output=[], depth=0) => {
 //------------------------------------------------
 
 
-// function for formulas split (вот это ересь надо довести до ума, потому что она неправильно сплитует строку)
+// function for set depth in tree
 //------------------------------------------------
-
-
 function setDepth(node, depth) {
   if (node.type === "function" && node.arguments.length > 0) {
     node.depth = depth;
@@ -115,9 +113,6 @@ function setDepth(node, depth) {
     node.depth = depth;
   }
 }
-
-
-
 //------------------------------------------------
 
 //var valuesFormulaArray = ["SUM(SUM(1,2),ABS(4),3,AVERAGE(MAX(8,1,5),SUM(4,3,7)))", "SUM(1,2)", "ABS(4)", "3", "AVERAGE(MAX(8,1,5),SUM(4,3,7))", "MAX(8,1,5)", "SUM(4,3,7)"];
@@ -132,11 +127,43 @@ const insertText = async () => {
       let range = context.workbook.getSelectedRange();
       range.load("formulas");
       console.log(range)
-     // console.log(range.m_formulas)
       await context.sync();
-      //console.log(range.formulas[0][0]);
+      //console.log(range.formulas)
+      //if(typeof range.formulas[0][0] == "string") console.log("AHAHAHAHAHAHAH");
+      //console.log(typeof range.formulas[0][0]);
+      range.formulas[0][0] = convertRanges(range.formulas[0][0]);
+      console.log(typeof range.formulas[0][0]);
 
-      // Заменяем последовательности "-" согласно вашим правилам
+
+      /*var flag = true;
+      while(flag){
+        var formulasCells = range.formulas[0][0].match(/[A-Za-z]+\d+/g);
+        for (var i = 0; i < formulasCells.length; i++) {
+          const new_sheet = context.workbook.worksheets.getActiveWorksheet();
+          var formulasRange = new_sheet.getRange(formulasCells[i]);
+          formulasRange.load("formulas");
+          //console.log(formulasRange)
+          await context.sync();
+          if(typeof formulasRange.formulas[0][0] == "string"){
+            range.formulas[0][0] = range.formulas[0][0].replace(formulasCells[i], formulasRange.formulas[0][0].slice(1))
+            console.log("NEW RANGE.FORMULAS[0][0]" + range.formulas[0][0]);
+          }
+          range.formulas[0][0] = convertRanges(range.formulas[0][0])
+          var newCells = range.formulas[0][0].match(/[A-Za-z]+\d+/g);
+          for(var j = 0; j < newCells.length; j++){
+            const new_new_sheet = context.workbook.worksheets.getActiveWorksheet();
+            var newFormulasRange = new_new_sheet.getRange(newCells[i]);
+            newFormulasRange.load("formulas");
+            await context.sync();
+            if(typeof newFormulasRange.formulas[0][0] != "string") flag = false;
+            else flag = true;
+          }
+        }
+      };
+      */
+
+
+      // Заменяем последовательности "-"
       var withoutMinusString = range.formulas[0][0].replace(/(-{2,})/g, function(match, p1) {
           return p1.length % 2 === 0 ? '' : '-';
       });
