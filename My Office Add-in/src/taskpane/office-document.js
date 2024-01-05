@@ -85,14 +85,19 @@ const getFormula = (node) => {
   if (node.type === "function") {
     if (node.arguments) {
       return node.name + "(" + node.arguments.map(getFormula).join(",") + ")";
-    } 
+    }
     return node.name + "()";
-  } else {
+  } else if (node.type === "cell-range"){
+    //if (node.left && node.right){}
+    return node.left.key + ":" + node.right.key; // короче, эта хуйня
+  }else {
     if (node.operator == "-") {
-      return -node.operand.value;
+      //return -node.operand.value;
+      return -node.operand.key;
     }
     else{
-      return node.value;
+      //return node.value;
+      return node.key;
     }
   }
   return node.value;
@@ -100,7 +105,7 @@ const getFormula = (node) => {
 
 // YOUR COMMENT
 const walkTree = (node, output=[], depth=0) => {
-  if (node.type === "function") {
+  if (node.type === "function" || node.type === "cell-range" || node.type === "cell") {
     output.push({
       name: getFormula(node),
       depth
@@ -109,6 +114,7 @@ const walkTree = (node, output=[], depth=0) => {
       node.arguments.forEach(arg => walkTree(arg, output, depth + 1));
     }
   }
+  console.log(output);
   return output;
 };
 
@@ -134,14 +140,32 @@ const insertText = async () => {
       
       let range = context.workbook.getSelectedRange();
       range.load("formulas");
+      range.load("values");
+      range.load("text");
       console.log(range)
       await context.sync();
-      //console.log(range.formulas)
+      //console.log("formulas" + range.formulas[0][0]);
+      //console.log("values, " + range.values[0][0] + ', ' + typeof range.values[0][0]);
+      //console.log("text" + range.text[0][0]);
       //if(typeof range.formulas[0][0] == "string") console.log("AHAHAHAHAHAHAH");
       //console.log(typeof range.formulas[0][0]);
-      range.formulas[0][0] = convertRanges(range.formulas[0][0]);
-      console.log(typeof range.formulas[0][0]);
+      //range.formulas[0][0] = convertRanges(range.formulas[0][0]);
+      //console.log(typeof range.formulas[0][0]);
 
+      //after convert ranges we're check void cells and delete cells without value and cells which have text value
+      /*var voidCells = range.formulas[0][0].match(/[A-Za-z]+\d+/g);
+      for (var i = 0; i < voidCells.length; i++) {
+        const sheet = context.workbook.worksheets.getActiveWorksheet();
+        var valuesRange = sheet.getRange(voidCells[i]);
+        valuesRange.load("values");
+        //console.log(valuesRange)
+        await context.sync();
+        if(typeof valuesRange.values[0][0] == "string"){
+          range.formulas[0][0] = range.formulas[0][0].replace(','+voidCells[i], '');
+        }
+      };
+      console.log("formulas" + range.formulas[0][0]);
+      return 0;*/
 
       /*var flag = true;
       while(flag){
@@ -172,16 +196,18 @@ const insertText = async () => {
 
 
       // replace strings with "-"
-      var withoutMinusString = range.formulas[0][0].replace(/(-{2,})/g, function(match, p1) {
+      var lettersFormula = range.formulas[0][0].replace(/(-{2,})/g, function(match, p1) {
           return p1.length % 2 === 0 ? '' : '-';
       });
 
-      var lettersFormula = convertRanges(withoutMinusString); // Take cells formula like a string
+      console.log(lettersFormula);
 
-      console.log(lettersFormula)
+      //var lettersFormula = convertRanges(lettersFormula); // Take cells formula like a string
+
+      console.log(lettersFormula);
 
       //________________________________________________ convert string formula to formula with numbers
-      var cells = lettersFormula.match(/[A-Za-z]+\d+/g);
+      /*var cells = lettersFormula.match(/[A-Za-z]+\d+/g);
       var cellsMap = new Map();
 
       console.log(cells)
@@ -203,7 +229,8 @@ const insertText = async () => {
       cellsMap.forEach((value, key) => {
         const regex = new RegExp(key, 'g');
         valuesFormula = valuesFormula.replace(regex, value);
-      }); 
+      });*/
+      var valuesFormula = "тут должна быть формула с цифрами... или не должна...";
 
       
       
@@ -212,8 +239,9 @@ const insertText = async () => {
 
       //________________________________________________ create arrays with split formulas (сначала надо довести до ума функцию, которая сплитует нашу строку)
 
-      console.log(valuesFormula);
-      const parseTree = parse(valuesFormula);
+      //console.log(valuesFormula);
+      //const parseTree = parse(valuesFormula);
+      const parseTree = parse(lettersFormula);
       console.log(parseTree);
 
       setDepth(parseTree,0);
@@ -228,9 +256,9 @@ const insertText = async () => {
       console.log(valuesFormulaArray);
  
 
-      context.workbook.worksheets.getItemOrNullObject("SpecialCalculationField").delete(); // delete old calculation field
+      //context.workbook.worksheets.getItemOrNullObject("SpecialCalculationField").delete(); // delete old calculation field
 
-      const creatFieldSheet = context.workbook.worksheets.add("SpecialCalculationField"); // add new calculation field
+      //const creatFieldSheet = context.workbook.worksheets.add("SpecialCalculationField"); // add new calculation field
 
       const formulasObjectsArray = [];
 
@@ -242,10 +270,13 @@ const insertText = async () => {
 
 
       for (var i=0; i<valuesFormulaArray.length; i++) {
-        const calcSheet = context.workbook.worksheets.getItem("SpecialCalculationField");
-        let calcRange = calcSheet.getRange("A1");
+        //const calcSheet = context.workbook.worksheets.getItem("SpecialCalculationField");
+        //let calcRange = calcSheet.getRange("A1");
+        const calcSheet = context.workbook.worksheets.getActiveWorksheet(); //new
+        let calcRange = calcSheet.getRange("BBB10000"); // new
         calcRange.formulas = [["=" + valuesFormulaArray[i].name]];
-        calcRange = calcSheet.getRange("A1");
+        //calcRange = calcSheet.getRange("A1");
+        calcRange = calcSheet.getRange("BBB10000"); // new
         calcRange.load("text");
         await context.sync();
         const formulaObject = {
@@ -266,7 +297,7 @@ const insertText = async () => {
       console.log("обновили")
 
 
-      context.workbook.worksheets.getItemOrNullObject("SpecialCalculationField").delete(); // delete new calculation field
+      //context.workbook.worksheets.getItemOrNullObject("SpecialCalculationField").delete(); // delete new calculation field
       await context.sync();
       //________________________________________________
 

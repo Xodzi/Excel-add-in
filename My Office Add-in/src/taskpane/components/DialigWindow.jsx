@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import queryString from 'query-string';
 import {parse, visit} from 'excel-formula-parser';
 import ArrayComponent from "../components/ArrayComponent";
+import Tree from '../components/TreeNode';
 import { Button } from 'react-bootstrap';
 
 export default function DialigWindow(props) {
@@ -18,13 +19,14 @@ export default function DialigWindow(props) {
 
   useEffect(() => {
     // Получение параметра jsonString из URL
-    console.log(props)
+    console.log(props);
     const { jsonString } = queryString.parse(window.location.search);
 
     if (jsonString) {
       // Преобразование JSON-строки в массив и установка состояния
       const formulasObjectsArray = JSON.parse(jsonString);
       SetArray(formulasObjectsArray);
+      console.log(array);
     }
   }, []);
 
@@ -83,6 +85,7 @@ export default function DialigWindow(props) {
       <div style={block}>
         <div style={treeHedlineStyle}>Дерево функции</div>
         <ArrayComponent valuesFormulaArray={array}></ArrayComponent>
+        {/*<Tree tree={array} />*/}
       </div>
 
     </div>
