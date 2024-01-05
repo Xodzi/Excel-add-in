@@ -192,19 +192,18 @@ const insertText = async () => {
           }
         }
       };
-      */
+      
 
 
       // replace strings with "-"
       var lettersFormula = range.formulas[0][0].replace(/(-{2,})/g, function(match, p1) {
           return p1.length % 2 === 0 ? '' : '-';
-      });
+      });*/
 
+      var lettersFormula = range.formulas[0][0];
       console.log(lettersFormula);
 
       //var lettersFormula = convertRanges(lettersFormula); // Take cells formula like a string
-
-      console.log(lettersFormula);
 
       //________________________________________________ convert string formula to formula with numbers
       /*var cells = lettersFormula.match(/[A-Za-z]+\d+/g);
