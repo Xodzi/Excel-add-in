@@ -4,6 +4,7 @@ import {parse, visit} from 'excel-formula-parser';
 import ArrayComponent from "../components/ArrayComponent";
 import Tree from '../components/TreeNode';
 import { Button } from 'react-bootstrap';
+import TreeViewTable from './TreeViewTable';
 
 export default function DialigWindow(props) {
 
@@ -85,6 +86,7 @@ export default function DialigWindow(props) {
       <div style={block}>
         <div style={treeHedlineStyle}>Дерево функции</div>
         <ArrayComponent valuesFormulaArray={array}></ArrayComponent>
+        <TreeViewTable data={array}/>
         {/*<Tree tree={array} />*/}
       </div>
 

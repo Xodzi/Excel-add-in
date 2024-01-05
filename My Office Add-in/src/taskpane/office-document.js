@@ -91,9 +91,24 @@ const getFormula = (node) => {
     //if (node.left && node.right){}
     return node.left.key + ":" + node.right.key; // короче, эта хуйня
   }else {
-    if (node.operator == "-") {
-      //return -node.operand.value;
-      return -node.operand.key;
+    if (node.operator == "+" && node.left != null && node.right != null && node.type == "binary-expression"){
+      return getFormula(node.left)+ "+" + getFormula(node.right);
+    }
+    if(node.operator == "*" && node.left != null && node.right != null && node.type == "binary-expression"){
+      return getFormula(node.left)+ "*" + getFormula(node.right);
+    }
+    if(node.operator == "/" && node.left != null && node.right != null && node.type == "binary-expression"){
+      return getFormula(node.left)+ "/" + getFormula(node.right);
+    }
+    if (node.operator == "-" && node.type == "unary-expression") {
+      //console.log(node.operand.arguments.map(getFormula).join(",") + ")")
+      return "-" + getFormula(node.operand);
+    }
+    if(node.operator == "-" && node.type == "binary-expression"){
+      return getFormula(node.left) + "-" + getFormula(node.right);
+    }
+    if(node.type == "number"){
+      return node.value;
     }
     else{
       //return node.value;
@@ -105,13 +120,16 @@ const getFormula = (node) => {
 
 // YOUR COMMENT
 const walkTree = (node, output=[], depth=0) => {
-  if (node.type === "function" || node.type === "cell-range" || node.type === "cell") {
+  if (node.type === "function" || node.type === "cell-range" || node.type === "cell" || node.type == "binary-expression" || node.type == "unary-expression") {
     output.push({
       name: getFormula(node),
       depth
     });
     if (node.arguments) {
       node.arguments.forEach(arg => walkTree(arg, output, depth + 1));
+    }
+    if(node.operand){
+      walkTree(node.operand, output, depth+1)
     }
   }
   console.log(output);
