@@ -7,7 +7,7 @@ import {parse, visit} from 'excel-formula-parser';
 // this part of code convert ranges to values arrays
 //------------------------------------------------
 // MY COMMENT
-function convertRanges(formula) {
+/*function convertRanges(formula) {
   return formula.replace(/([A-Z]+\d+):([A-Z]+\d+)/g, function(match, start, end) {
       return createArrayFromRange(start, end);
   });
@@ -38,48 +38,13 @@ function parseCell(cell) {
 // MY COMMENT
 function createCellName(row, column) {
   return column + row;
-}
+}*/
 //------------------------------------------------
 
 
 
 // this part of code convert parse tree to array
 //------------------------------------------------
-// YOUR COMMENT
-function getSubFormulas(node) {
-  if (node.type === "function") {
-    var args = node.arguments.map(arg => {
-      if (arg.arguments) {
-        // If the argument is an array, extract the name property from each element
-        return arg.name + "(" + arg.arguments.map(subArg => getSubFormulas(subArg).name).join(",") + ")";
-      } else {
-        // If the argument is not an array, extract the name property
-        return getSubFormulas(arg).name;
-      }
-    }).join(",");
-
-    var name = `${node.name}(${args})`;
-
-    if (args === "") {
-      // Handle the case where there are no arguments
-      name = `${node.name}()`;
-    }
-
-    const formula = {
-      name: name,
-      depth: node.depth
-    };
-    return [formula, ...node.arguments.filter((elem) => elem.type == "function").map(getSubFormulas).flat()];
-  } else {
-    if (node.operand == null) {
-      let temp_name = node.value;
-      return { name: temp_name };
-    }
-    let temp_name = 0 - node.operand.value;
-    return { name: temp_name };
-  }
-}
-
 // YOUR COMMENT
 const getFormula = (node) => {
   if (node.type === "function") {
@@ -88,13 +53,16 @@ const getFormula = (node) => {
     }
     return node.name + "()";
   } else if (node.type === "cell-range"){
-    //if (node.left && node.right){}
-    return node.left.key + ":" + node.right.key; // короче, эта хуйня
+    return getFormula(node.left)+ ":" + getFormula(node.right);
   }else {
-    if (node.operator == "+" && node.left != null && node.right != null && node.type == "binary-expression"){
-      return getFormula(node.left)+ "+" + getFormula(node.right);
+    if (node.left != null && node.right != null && node.type == "binary-expression"){
+      return getFormula(node.left)+ node.operator + getFormula(node.right);
     }
-    if(node.operator == "*" && node.left != null && node.right != null && node.type == "binary-expression"){
+    if (node.type == "unary-expression") {
+      //console.log(node.operand.arguments.map(getFormula).join(",") + ")")
+      return node.operator + getFormula(node.operand);
+    }
+    /*if(node.operator == "*" && node.left != null && node.right != null && node.type == "binary-expression"){
       return getFormula(node.left)+ "*" + getFormula(node.right);
     }
     if(node.operator == "/" && node.left != null && node.right != null && node.type == "binary-expression"){
@@ -107,6 +75,9 @@ const getFormula = (node) => {
     if(node.operator == "-" && node.type == "binary-expression"){
       return getFormula(node.left) + "-" + getFormula(node.right);
     }
+    if(node.operator == ">" && node.type == "binary-expression"){
+      return getFormula(node.left) + "-" + getFormula(node.right);
+    }*/
     if(node.type == "number"){
       return node.value;
     }
@@ -129,7 +100,11 @@ const walkTree = (node, output=[], depth=0) => {
       node.arguments.forEach(arg => walkTree(arg, output, depth + 1));
     }
     if(node.operand){
-      walkTree(node.operand, output, depth+1)
+      walkTree(node.operand, output, depth + 1)
+    }
+    if(node.type === "binary-expression"){
+      walkTree(node.left, output, depth + 1);
+      walkTree(node.right, output, depth + 1)
     }
   }
   console.log(output);
@@ -155,11 +130,10 @@ function setDepth(node, depth) {
 const insertText = async () => {
   try {
     await Excel.run(async (context) => {
-      
       let range = context.workbook.getSelectedRange();
       range.load("formulas");
-      range.load("values");
-      range.load("text");
+      //range.load("values");
+      //range.load("text");
       console.log(range)
       await context.sync();
       //console.log("formulas" + range.formulas[0][0]);
@@ -331,6 +305,13 @@ const insertText = async () => {
       //________________________________________________
     });
   } catch (error) {
+    let dialog;
+      Office.context.ui.displayDialogAsync('https://localhost:3000/taskpane.html?dialogID=15&lettersFormula=' + lettersFormula + '&valuesFormula=' + valuesFormula + '&jsonString=' + jsonString, {height: 45, width: 50},
+          function (asyncResult) {
+              dialog = asyncResult.value;
+              dialog.addEventHandler(Office.EventType.DialogMessageReceived, processMessage);
+          }
+      )
     console.log("Error: " + error);
   }
 

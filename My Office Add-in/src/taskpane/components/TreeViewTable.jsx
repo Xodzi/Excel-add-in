@@ -1,11 +1,12 @@
 import React from 'react';
 
+
 const TreeViewTable = ({ data }) => {
   const renderNode = (node) => (
-    <tr key={node.name.split('(')[0]}>
-      <td style={{ paddingLeft: node.depth * 20 }}>{node.name}</td>
-      <td>{node.res}</td>
-      <td>Тут будет какая-то полезная инфа как на примере</td>
+    <tr key={node.name}>
+      <td style={{paddingLeft: node.depth * 20}}>{node.name.split('(')[0]}</td>
+      <td style={{textAlign: "center"}}>{node.res}</td>
+      <td style={{textAlign: "center"}}>Тут будет что-то</td>
     </tr>
   );
 
@@ -31,7 +32,12 @@ const TreeViewTable = ({ data }) => {
   const treeData = buildTree(data);
 
   return (
-    <table>
+    <table style={{width: "100%"}}>
+      <colgroup>
+       <col span="1" style={{width: "auto"}}></col>
+       <col span="1" style={{width: "25%"}}></col>
+       <col span="1" style={{width: "25%"}}></col>
+      </colgroup>
       <thead>
         <tr>
           <th>Name</th>
@@ -39,7 +45,7 @@ const TreeViewTable = ({ data }) => {
           <th>Info</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody style={{fontSize: "90%"}}>
         {treeData.map(renderNode)}
       </tbody>
     </table>

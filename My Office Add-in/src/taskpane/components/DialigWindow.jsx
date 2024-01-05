@@ -27,7 +27,7 @@ export default function DialigWindow(props) {
       // Преобразование JSON-строки в массив и установка состояния
       const formulasObjectsArray = JSON.parse(jsonString);
       SetArray(formulasObjectsArray);
-      console.log(array);
+      console.log(formulasObjectsArray);
     }
   }, []);
 
