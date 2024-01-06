@@ -42,6 +42,71 @@ function createCellName(row, column) {
 //------------------------------------------------
 
 
+// this part create string exists @ signs
+//------------------------------------------------
+function findMatchIndexes(originalString, targetString) {
+  const indexStart = originalString.indexOf(targetString);
+  
+  if (indexStart !== -1) {
+      const indexEnd = indexStart + targetString.length - 1;
+      //console.log(indexStart + ', ' + indexEnd);
+      return [indexStart, indexEnd];
+  } else {
+      console.log('Совпадение не найдено.');
+  }
+}
+
+
+function createPaddedString(inputString, newStringLength, indexRange) {
+  if (indexRange[1] < indexRange[0] || indexRange[1] - indexRange[0] >= inputString.length) {
+      console.log('Неверные индексы.');
+      return;
+  }
+
+  const paddingLength = newStringLength - inputString.length;
+  if (paddingLength < 0) {
+      console.log('Новая длина строки меньше длины входной строки.');
+      return;
+  }
+
+  const paddingBefore = '@'.repeat(indexRange[0]);
+  const paddingAfter = '@'.repeat(paddingLength - indexRange[0]);
+  const resultString = paddingBefore + inputString + paddingAfter;
+
+  return resultString;
+}
+
+
+function addMissingParentheses(originalString, targetString) {
+  const stack = [];
+  const missingParentheses = [];
+
+  for (let i = 0; i < originalString.length; i++) {
+      if (originalString[i] === '(') {
+          stack.push(i);
+      } else if (originalString[i] === ')') {
+          if (stack.length === 0) {
+              missingParentheses.push(i);
+          } else {
+              stack.pop();
+          }
+      }
+  }
+
+  stack.forEach(index => missingParentheses.push(index));
+
+  const sortedParentheses = missingParentheses.sort((a, b) => a - b);
+
+  let resultString = targetString;
+  sortedParentheses.forEach(index => {
+      resultString = resultString.substring(0, index) + '(' + resultString.substring(index);
+  });
+
+  return resultString;
+}
+
+//------------------------------------------------
+
 
 // this part of code convert parse tree to array
 //------------------------------------------------
@@ -281,8 +346,9 @@ const insertText = async () => {
         formulasValuesMap.set(valuesFormulaArray[i], calcRange.text[0][0]);
       }
 
+
       var jsonString = JSON.stringify(formulasObjectsArray);
-      console.log(JSON.stringify(parseTree))
+      console.log(JSON.stringify(parseTree));
       console.log(jsonString);
       await localStorage.setItem('arrayData', JSON.stringify(formulasObjectsArray));
       console.log("обновили")
@@ -296,7 +362,7 @@ const insertText = async () => {
       //________________________________________________ declare dialog as global for use in later functions.
       //return(formulasValuesMap);
       let dialog;
-      Office.context.ui.displayDialogAsync('https://localhost:3000/taskpane.html?dialogID=15&lettersFormula=' + lettersFormula + '&valuesFormula=' + valuesFormula + '&jsonString=' + jsonString, {height: 45, width: 50},
+      Office.context.ui.displayDialogAsync('https://localhost:3000/taskpane.html?dialogID=15&lettersFormula=' + lettersFormula.replace(/\+/g, "@") + '&valuesFormula=' + valuesFormula + '&jsonString=' + jsonString.replace(/\+/g, "@"), {height: 45, width: 50},
           function (asyncResult) {
               dialog = asyncResult.value;
               dialog.addEventHandler(Office.EventType.DialogMessageReceived, processMessage);

@@ -25,15 +25,17 @@ export default function DialigWindow(props) {
 
     if (jsonString) {
       // Преобразование JSON-строки в массив и установка состояния
-      const formulasObjectsArray = JSON.parse(jsonString);
+      const formulasObjectsArray = JSON.parse(jsonString.replace(/\@/g, "+"));
       SetArray(formulasObjectsArray);
       console.log(formulasObjectsArray);
     }
   }, []);
 
-  //console.log("check before");
+  console.log(array);
 
-  //console.log(array);
+  console.log(array[0]);
+
+  //console.log(array[0].name);
 
   //var lettersParts = props.lettersFormula.match(/[^();]+|\([^()]*\)/g);
 
@@ -75,7 +77,7 @@ export default function DialigWindow(props) {
 
       <div style={block}>
         <div style={hedlineStyle}>Выбранная формула:</div>
-        <div>{props.lettersFormula}</div>
+        <div>{props.lettersFormula.replace(/\@/g, "+")}</div>
       </div>
 
       <div style={block}>
