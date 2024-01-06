@@ -1,7 +1,11 @@
 import {parse, visit} from 'excel-formula-parser';
+import { HyperFormula } from 'hyperformula';
 
 /* global Excel console */
 
+const options = {
+  licenseKey: 'gpl-v3'
+};
 
 
 // this part of code convert ranges to values arrays
@@ -62,22 +66,6 @@ const getFormula = (node) => {
       //console.log(node.operand.arguments.map(getFormula).join(",") + ")")
       return node.operator + getFormula(node.operand);
     }
-    /*if(node.operator == "*" && node.left != null && node.right != null && node.type == "binary-expression"){
-      return getFormula(node.left)+ "*" + getFormula(node.right);
-    }
-    if(node.operator == "/" && node.left != null && node.right != null && node.type == "binary-expression"){
-      return getFormula(node.left)+ "/" + getFormula(node.right);
-    }
-    if (node.operator == "-" && node.type == "unary-expression") {
-      //console.log(node.operand.arguments.map(getFormula).join(",") + ")")
-      return "-" + getFormula(node.operand);
-    }
-    if(node.operator == "-" && node.type == "binary-expression"){
-      return getFormula(node.left) + "-" + getFormula(node.right);
-    }
-    if(node.operator == ">" && node.type == "binary-expression"){
-      return getFormula(node.left) + "-" + getFormula(node.right);
-    }*/
     if(node.type == "number"){
       return node.value;
     }
@@ -122,6 +110,17 @@ function setDepth(node, depth) {
   }
 };
 //------------------------------------------------
+
+
+function getListIdx(str, substr) {
+  let listIdx = []
+  let lastIndex = -1
+  while ((lastIndex = str.indexOf(substr, lastIndex + 1)) !== -1) {
+    listIdx.push(lastIndex)
+  }
+  return listIdx
+}
+
 
 
 
@@ -232,8 +231,12 @@ const insertText = async () => {
 
       //console.log(valuesFormula);
       //const parseTree = parse(valuesFormula);
-      const parseTree = parse(lettersFormula);
-      console.log(parseTree);
+      const regex = /([A-Z]\d+)\s*([<>]=?|!=)\s*([A-Z]\d+)\s*&\s*([A-Z]\d+)\s*([<>]=?|!=)\s*([A-Z]\d+)/g;
+      const transformedString = lettersFormula.replace(regex, "AND($1$2$3, $4$5$6)");
+
+      console.log(transformedString)
+
+      const parseTree = parse(transformedString);
 
       setDepth(parseTree,0);
       //________________________________________________
@@ -245,6 +248,7 @@ const insertText = async () => {
       //var valuesFormulaArray = getSubFormulas(parseTree);
       var valuesFormulaArray = walkTree(parseTree);
       console.log(valuesFormulaArray);
+      
  
 
       //context.workbook.worksheets.getItemOrNullObject("SpecialCalculationField").delete(); // delete old calculation field
