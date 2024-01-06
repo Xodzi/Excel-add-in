@@ -54,7 +54,7 @@ function findMatchIndexes(originalString, targetString) {
   if (indexStart !== -1) {
       const indexEnd = indexStart + targetString.length - 1;
       //console.log(indexStart + ', ' + indexEnd);
-      return [indexStart, indexEnd];
+      return [indexStart-1, indexEnd-1];
   } else {
       console.log('Совпадение не найдено.');
   }
@@ -80,36 +80,35 @@ function createPaddedString(inputString, newStringLength, indexRange) {
   return resultString;
 }
 
+//------------------------------------------------
 
-function addMissingParentheses(originalString, targetString) {
-  const stack = [];
-  const missingParentheses = [];
 
-  for (let i = 0; i < originalString.length; i++) {
-      if (originalString[i] === '(') {
-          stack.push(i);
-      } else if (originalString[i] === ')') {
-          if (stack.length === 0) {
-              missingParentheses.push(i);
-          } else {
-              stack.pop();
+/*function findElements(openArray, closeArray, startIndex, endIndex) {
+  const result = [];
+
+  for (let i = 0; i < openArray.length; i++) {
+      if (openArray[i] >= startIndex && openArray[i] < endIndex ) {
+          for (let j = 0; j < closeArray.length; j++) {
+              if (closeArray[j] <= endIndex) {
+                  result.push({ open: openArray[i], close: closeArray[j] });
+              }
           }
       }
   }
 
-  stack.forEach(index => missingParentheses.push(index));
+  return result;
+}*/
 
-  const sortedParentheses = missingParentheses.sort((a, b) => a - b);
 
-  let resultString = targetString;
-  sortedParentheses.forEach(index => {
-      resultString = resultString.substring(0, index) + '(' + resultString.substring(index);
-  });
+function insertCharacterAt(str, char, index) {
+  if (index < 0 || index > str.length) {
+      console.error("Index is out of bounds.");
+      return str;
+  }
 
-  return resultString;
+  const result = str.slice(0, index-1) + char + str.slice(index-1, str.length-1);
+  return result;
 }
-
-//------------------------------------------------
 
 
 // this part of code convert parse tree to array
@@ -314,7 +313,39 @@ const insertText = async () => {
       var valuesFormulaArray = walkTree(parseTree);
       console.log(valuesFormulaArray);
       
- 
+
+      /*
+      var openArray = getListIdx(lettersFormula, "(");
+      var closeArray = getListIdx(lettersFormula, ")");
+      console.log(openArray);
+      console.log(closeArray);
+      for (var i=1; i<valuesFormulaArray.length; i++){
+        var indexRange = findMatchIndexes(valuesFormulaArray[0].name, valuesFormulaArray[i].name);
+        var secondString = createPaddedString(valuesFormulaArray[i].name, lettersFormula.length-1, indexRange);
+        var checkString = secondString;
+        //var result = findElements(openArray, closeArray, indexRange[0], indexRange[1]);
+        console.log(indexRange);
+        console.log(secondString);
+        //console.log(result);
+        for (var j=0; j<openArray.length; j++){
+          if (secondString[openArray[j]-1] != "("){
+            console.log("j: " + secondString[openArray[j]]);
+            console.log("j-1: " + secondString[openArray[j]-1]);
+            secondString = insertCharacterAt(secondString, "(", openArray[j]);
+          }
+          console.log(secondString);
+        }
+        for (var j=0; j<closeArray.length; j++){
+          if (secondString[closeArray[j]+1] != ")"){
+            secondString = insertCharacterAt(secondString, ")", closeArray[j]);
+          }
+          //console.log(secondString);
+        }
+        //console.log(secondString);
+      }
+      valuesFormulaArray[0].name = lettersFormula.substring(1, lettersFormula.length);
+      */
+
 
       //context.workbook.worksheets.getItemOrNullObject("SpecialCalculationField").delete(); // delete old calculation field
 
