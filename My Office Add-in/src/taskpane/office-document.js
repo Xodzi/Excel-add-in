@@ -246,6 +246,8 @@ const insertText = async () => {
       console.log(maxDepth);
 
       for (var i=0; i<valuesFormulaArray.length; i++) {
+
+        
         const calcSheet = context.workbook.worksheets.getActiveWorksheet();
         let calcRange = calcSheet.getRange("BBB10000"); // new
         calcRange.formulas = [["=" + valuesFormulaArray[i].name]];
@@ -253,9 +255,19 @@ const insertText = async () => {
         calcRange.load("text");
         calcRange.load("values");
         await context.sync();
+
+        if(i == 0){ //проверка чтобы добавить аддрес
+          const formulaObject = {
+            name: range.address.split('!')[1], // valuesFormulaArray[i].name
+            depth: valuesFormulaArray[i].depth, // valuesFormulaArray[i].depth // Здесь должно быть значение глубины, но оно пока не известно
+            res: calcRange.text[0][0]
+          };
+          formulasObjectsArray.push(formulaObject);
+        }
+
         const formulaObject = {
           name: valuesFormulaArray[i].name,
-          depth: valuesFormulaArray[i].depth,
+          depth: valuesFormulaArray[i].depth+1,
           res: calcRange.text[0][0]
         };
         formulasObjectsArray.push(formulaObject);
