@@ -110,6 +110,7 @@ const insertText = async () => {
       range.load("formulas");
       range.load("values");
       range.load("text");
+      range.load("address")
       console.log(range)
       await context.sync();
       console.log("formulas" + range.formulas[0][0] + ', ' + typeof range.formulas[0][0]);
@@ -178,6 +179,9 @@ const insertText = async () => {
             name: getFormula(node),
             depth
           });
+          if(node.type == "cell"){
+            console.log(node)
+          }
           if (node.arguments) {
             node.arguments.forEach(arg => walkTree(arg, output, depth + 1));
           }
