@@ -44,6 +44,10 @@ function createPaddedString(inputString, newStringLength, indexRange) {
 
 //------------------------------------------------
 
+function checkStrDigit(str) {
+  console.log(/^\d+$/.test(str));
+}  
+
 
 /*function findElements(openArray, closeArray, startIndex, endIndex) {
   const result = [];
@@ -166,6 +170,7 @@ const insertText = async () => {
           }
           else{
             //return node.value;
+            console.log(node)
             return node.key;
           }
         }
@@ -174,14 +179,16 @@ const insertText = async () => {
 
 
       const walkTree = (node, output=[], depth=0) => {
+        //console.log(node)
         if (node.type === "function" || node.type === "cell-range" || node.type === "cell" || node.type == "binary-expression" || node.type == "unary-expression") {
           output.push({
             name: getFormula(node),
             depth
           });
-          if(node.type == "cell"){
-            console.log(node)
-          }
+          if(node.type=="cell") output.push({
+            name: node.key+"IsCell",
+            depth
+          });;
           if (node.arguments) {
             node.arguments.forEach(arg => walkTree(arg, output, depth + 1));
           }
@@ -239,26 +246,48 @@ const insertText = async () => {
 
       console.log(valuesFormulaArray)
 
-      var maxDepth = 0;
+
       for (var i=0; i<valuesFormulaArray.length; i++) {
-        // Проверяем, если у текущего объекта depth больше текущей максимальной глубины
-        if (valuesFormulaArray[i].depth > maxDepth) {
-          // Обновляем максимальную глубину
-          maxDepth = valuesFormulaArray[i].depth;
+
+        var flag = null;
+
+        console.log(valuesFormulaArray[i].name)
+
+        if(valuesFormulaArray[i].name.includes("IsCell")){
+          console.log(i)
+          console.log(valuesFormulaArray[i])
+          let temp = context.workbook.worksheets.getActiveWorksheet();
+          
+          valuesFormulaArray[i].name = valuesFormulaArray[i].name.split("IsCell")[0]
+          let temp_range = temp.getRange(valuesFormulaArray[i].name);
+          console.log(valuesFormulaArray[i].name.split("IsCell")[0])
+
+          temp_range.load("formulas")
+          console.log(temp_range)
+          await context.sync();
+          if(temp_range.formulas[0][0][0] != undefined){
+            console.log(temp_range.formulas[0][0][0])
+            flag = {
+              name: temp_range.formulas[0][0]+"",
+              depth: valuesFormulaArray[i].depth+2,
+              res: null
+            }
+            console.log(flag)
+          }
+          else{
+            continue
+          }
         }
-      }
-      console.log(maxDepth);
-
-      for (var i=0; i<valuesFormulaArray.length; i++) {
-
         
         const calcSheet = context.workbook.worksheets.getActiveWorksheet();
         let calcRange = calcSheet.getRange("BBB10000"); // new
         calcRange.formulas = [["=" + valuesFormulaArray[i].name]];
+        console.log(valuesFormulaArray[i].name)
         calcRange = calcSheet.getRange("BBB10000"); // new
         calcRange.load("text");
         calcRange.load("values");
         await context.sync();
+        console.log(calcRange.text)
 
         if(i == 0){ //проверка чтобы добавить аддрес
           const formulaObject = {
@@ -267,6 +296,15 @@ const insertText = async () => {
             res: calcRange.text[0][0]
           };
           formulasObjectsArray.push(formulaObject);
+          console.log(formulasObjectsArray)
+        }
+
+        if(flag != null){
+          flag.res = calcRange.text[0][0]
+          console.log(flag)
+          formulasObjectsArray.push(flag);
+          continue;
+          console.log(formulasObjectsArray)
         }
 
         const formulaObject = {
@@ -275,6 +313,8 @@ const insertText = async () => {
           res: calcRange.text[0][0]
         };
         formulasObjectsArray.push(formulaObject);
+        console.log(formulasObjectsArray)
+
         
         /*if (valuesFormulaArray[i].depth == maxDepth){
           let testRange = calcSheet.getRange(valuesFormulaArray[i].name);
