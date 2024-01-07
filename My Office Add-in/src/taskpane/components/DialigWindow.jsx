@@ -31,12 +31,6 @@ export default function DialigWindow(props) {
     }
   }, []);
 
-  console.log(array);
-
-  console.log(array[0]);
-
-  //console.log(array[0].name);
-
   //var lettersParts = props.lettersFormula.match(/[^();]+|\([^()]*\)/g);
 
   //var valuesParts = props.valuesFormula.match(/[^();]+|\([^()]*\)/g);

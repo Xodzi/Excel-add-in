@@ -8,44 +8,6 @@ const options = {
 };
 
 
-// this part of code convert ranges to values arrays
-//------------------------------------------------
-// MY COMMENT
-/*function convertRanges(formula) {
-  return formula.replace(/([A-Z]+\d+):([A-Z]+\d+)/g, function(match, start, end) {
-      return createArrayFromRange(start, end);
-  });
-}
-
-//MY COMMENT
-function createArrayFromRange(start, end) {
-  var startCell = parseCell(start);
-  var endCell = parseCell(end);
-  var array = [];
-
-  for (var i = startCell.row; i <= endCell.row; i++) {
-      for (var j = startCell.column.charCodeAt(0); j <= endCell.column.charCodeAt(0); j++) {
-          array.push(createCellName(i, String.fromCharCode(j)));
-      }
-  }
-
-  return array.join(',');
-}
-
-// MY COMMENT
-function parseCell(cell) {
-  var column = cell.match(/[A-Z]+/)[0];
-  var row = parseInt(cell.match(/\d+/)[0]);
-  return { column: column, row: row };
-}
-
-// MY COMMENT
-function createCellName(row, column) {
-  return column + row;
-}*/
-//------------------------------------------------
-
-
 // this part create string exists @ signs
 //------------------------------------------------
 function findMatchIndexes(originalString, targetString) {
@@ -113,55 +75,6 @@ function insertCharacterAt(str, char, index) {
 
 // this part of code convert parse tree to array
 //------------------------------------------------
-// YOUR COMMENT
-const getFormula = (node) => {
-  if (node.type === "function") {
-    if (node.arguments) {
-      return node.name + "(" + node.arguments.map(getFormula).join(",") + ")";
-    }
-    return node.name + "()";
-  } else if (node.type === "cell-range"){
-    return getFormula(node.left)+ ":" + getFormula(node.right);
-  }else {
-    if (node.left != null && node.right != null && node.type == "binary-expression"){
-      return getFormula(node.left)+ node.operator + getFormula(node.right);
-    }
-    if (node.type == "unary-expression") {
-      //console.log(node.operand.arguments.map(getFormula).join(",") + ")")
-      return node.operator + getFormula(node.operand);
-    }
-    if(node.type == "number"){
-      return node.value;
-    }
-    else{
-      //return node.value;
-      return node.key;
-    }
-  }
-  return node.value;
-};
-
-// YOUR COMMENT
-const walkTree = (node, output=[], depth=0) => {
-  if (node.type === "function" || node.type === "cell-range" || node.type === "cell" || node.type == "binary-expression" || node.type == "unary-expression") {
-    output.push({
-      name: getFormula(node),
-      depth
-    });
-    if (node.arguments) {
-      node.arguments.forEach(arg => walkTree(arg, output, depth + 1));
-    }
-    if(node.operand){
-      walkTree(node.operand, output, depth + 1)
-    }
-    if(node.type === "binary-expression"){
-      walkTree(node.left, output, depth + 1);
-      walkTree(node.right, output, depth + 1)
-    }
-  }
-  console.log(output);
-  return output;
-};
 
 
 // function for set tree elements depth
@@ -195,97 +108,24 @@ const insertText = async () => {
     await Excel.run(async (context) => {
       let range = context.workbook.getSelectedRange();
       range.load("formulas");
-      //range.load("values");
-      //range.load("text");
+      range.load("values");
+      range.load("text");
       console.log(range)
       await context.sync();
-      //console.log("formulas" + range.formulas[0][0]);
-      //console.log("values, " + range.values[0][0] + ', ' + typeof range.values[0][0]);
-      //console.log("text" + range.text[0][0]);
+      console.log("formulas" + range.formulas[0][0] + ', ' + typeof range.formulas[0][0]);
+      console.log("values, " + range.values[0][0] + ', ' + typeof range.values[0][0]);
+      console.log("text" + range.text[0][0] + ', ' + typeof range.text[0][0]);
       //if(typeof range.formulas[0][0] == "string") console.log("AHAHAHAHAHAHAH");
       //console.log(typeof range.formulas[0][0]);
       //range.formulas[0][0] = convertRanges(range.formulas[0][0]);
       //console.log(typeof range.formulas[0][0]);
-
-      //after convert ranges we're check void cells and delete cells without value and cells which have text value
-      /*var voidCells = range.formulas[0][0].match(/[A-Za-z]+\d+/g);
-      for (var i = 0; i < voidCells.length; i++) {
-        const sheet = context.workbook.worksheets.getActiveWorksheet();
-        var valuesRange = sheet.getRange(voidCells[i]);
-        valuesRange.load("values");
-        //console.log(valuesRange)
-        await context.sync();
-        if(typeof valuesRange.values[0][0] == "string"){
-          range.formulas[0][0] = range.formulas[0][0].replace(','+voidCells[i], '');
-        }
-      };
-      console.log("formulas" + range.formulas[0][0]);
-      return 0;*/
-
-      /*var flag = true;
-      while(flag){
-        var formulasCells = range.formulas[0][0].match(/[A-Za-z]+\d+/g);
-        for (var i = 0; i < formulasCells.length; i++) {
-          const new_sheet = context.workbook.worksheets.getActiveWorksheet();
-          var formulasRange = new_sheet.getRange(formulasCells[i]);
-          formulasRange.load("formulas");
-          //console.log(formulasRange)
-          await context.sync();
-          if(typeof formulasRange.formulas[0][0] == "string"){
-            range.formulas[0][0] = range.formulas[0][0].replace(formulasCells[i], formulasRange.formulas[0][0].slice(1))
-            console.log("NEW RANGE.FORMULAS[0][0]" + range.formulas[0][0]);
-          }
-          range.formulas[0][0] = convertRanges(range.formulas[0][0])
-          var newCells = range.formulas[0][0].match(/[A-Za-z]+\d+/g);
-          for(var j = 0; j < newCells.length; j++){
-            const new_new_sheet = context.workbook.worksheets.getActiveWorksheet();
-            var newFormulasRange = new_new_sheet.getRange(newCells[i]);
-            newFormulasRange.load("formulas");
-            await context.sync();
-            if(typeof newFormulasRange.formulas[0][0] != "string") flag = false;
-            else flag = true;
-          }
-        }
-      };
       
-
-
-      // replace strings with "-"
-      var lettersFormula = range.formulas[0][0].replace(/(-{2,})/g, function(match, p1) {
-          return p1.length % 2 === 0 ? '' : '-';
-      });*/
 
       var lettersFormula = range.formulas[0][0];
       console.log(lettersFormula);
 
-      //var lettersFormula = convertRanges(lettersFormula); // Take cells formula like a string
-
-      //________________________________________________ convert string formula to formula with numbers
-      /*var cells = lettersFormula.match(/[A-Za-z]+\d+/g);
-      var cellsMap = new Map();
-
-      console.log(cells)
-
-      for (var i = 0; i < cells.length; i++) {
-        const sheet = context.workbook.worksheets.getActiveWorksheet();
-        var valuesRange = sheet.getRange(cells[i]);
-        //valuesRange.load("formulas");
-        valuesRange.load("values");
-        //valuesRange.load("text");
-        console.log(valuesRange)
-        await context.sync();
-        if (valuesRange.values[0][0] == "") cellsMap.set(cells[i], 0);
-        else cellsMap.set(cells[i], valuesRange.values[0][0]);
-      }
-
-      // replace cells names in formula
-      var valuesFormula = lettersFormula;
-      cellsMap.forEach((value, key) => {
-        const regex = new RegExp(key, 'g');
-        valuesFormula = valuesFormula.replace(regex, value);
-      });*/
+      
       var valuesFormula = "тут должна быть формула с цифрами... или не должна...";
-
       
       
       //________________________________________________
@@ -293,8 +133,6 @@ const insertText = async () => {
 
       //________________________________________________ create arrays with split formulas (сначала надо довести до ума функцию, которая сплитует нашу строку)
 
-      //console.log(valuesFormula);
-      //const parseTree = parse(valuesFormula);
       const regex = /([A-Z]\d+)\s*([<>]=?|!=)\s*([A-Z]\d+)\s*&\s*([A-Z]\d+)\s*([<>]=?|!=)\s*([A-Z]\d+)/g;
       const transformedString = lettersFormula.replace(regex, "AND($1$2$3, $4$5$6)");
 
@@ -306,10 +144,56 @@ const insertText = async () => {
       //________________________________________________
 
 
-      //________________________________________________ create array with pieces formulas and calculate their values
-      // example of ideal formula split (здесь должна использоваться именно valuesFormulaArray, потому что по ней ведутся дальнейшие вычисления и создание formulasValuesMap)
-      //var valuesFormulaArray = ["SUM(SUM(1,2),ABS(4),3,AVERAGE(MAX(8,1,5),SUM(4,3,7)))", "SUM(1,2)", "ABS(4)", "3", "AVERAGE(MAX(8,1,5),SUM(4,3,7))", "MAX(8,1,5)", "SUM(4,3,7)"];
-      //var valuesFormulaArray = getSubFormulas(parseTree);
+      const getFormula = (node) => {
+        if (node.type === "function") {
+          if (node.arguments) {
+            return node.name + "(" + node.arguments.map(getFormula).join(",") + ")";
+          }
+          return node.name + "()";
+        } else if (node.type === "cell-range"){
+          return getFormula(node.left)+ ":" + getFormula(node.right);
+        }else {
+          if (node.left != null && node.right != null && node.type == "binary-expression"){
+            return getFormula(node.left)+ node.operator + getFormula(node.right);
+          }
+          if (node.type == "unary-expression") {
+            //console.log(node.operand.arguments.map(getFormula).join(",") + ")")
+            return node.operator + getFormula(node.operand);
+          }
+          if(node.type == "number"){
+            return node.value;
+          }
+          else{
+            //return node.value;
+            return node.key;
+          }
+        }
+        return node.value;
+      };
+
+
+      const walkTree = (node, output=[], depth=0) => {
+        if (node.type === "function" || node.type === "cell-range" || node.type === "cell" || node.type == "binary-expression" || node.type == "unary-expression") {
+          output.push({
+            name: getFormula(node),
+            depth
+          });
+          if (node.arguments) {
+            node.arguments.forEach(arg => walkTree(arg, output, depth + 1));
+          }
+          if(node.operand){
+            walkTree(node.operand, output, depth + 1)
+          }
+          if(node.type === "binary-expression"){
+            walkTree(node.left, output, depth + 1);
+            walkTree(node.right, output, depth + 1)
+          }
+        }
+        console.log(output);
+        return output;
+      };
+
+
       var valuesFormulaArray = walkTree(parseTree);
       console.log(valuesFormulaArray);
       
@@ -347,38 +231,60 @@ const insertText = async () => {
       */
 
 
-      //context.workbook.worksheets.getItemOrNullObject("SpecialCalculationField").delete(); // delete old calculation field
-
-      //const creatFieldSheet = context.workbook.worksheets.add("SpecialCalculationField"); // add new calculation field
-
       const formulasObjectsArray = [];
-
-      var cur_d = 0;
-
-      var formulasValuesMap = new Map();
 
       console.log(valuesFormulaArray)
 
+      var maxDepth = 0;
+      for (var i=0; i<valuesFormulaArray.length; i++) {
+        // Проверяем, если у текущего объекта depth больше текущей максимальной глубины
+        if (valuesFormulaArray[i].depth > maxDepth) {
+          // Обновляем максимальную глубину
+          maxDepth = valuesFormulaArray[i].depth;
+        }
+      }
+      console.log(maxDepth);
 
       for (var i=0; i<valuesFormulaArray.length; i++) {
-        //const calcSheet = context.workbook.worksheets.getItem("SpecialCalculationField");
-        //let calcRange = calcSheet.getRange("A1");
-        const calcSheet = context.workbook.worksheets.getActiveWorksheet(); //new
+        const calcSheet = context.workbook.worksheets.getActiveWorksheet();
         let calcRange = calcSheet.getRange("BBB10000"); // new
         calcRange.formulas = [["=" + valuesFormulaArray[i].name]];
-        //calcRange = calcSheet.getRange("A1");
         calcRange = calcSheet.getRange("BBB10000"); // new
         calcRange.load("text");
+        calcRange.load("values");
         await context.sync();
         const formulaObject = {
-          name: valuesFormulaArray[i].name, // valuesFormulaArray[i].name
-          depth: valuesFormulaArray[i].depth, // valuesFormulaArray[i].depth // Здесь должно быть значение глубины, но оно пока не известно
+          name: valuesFormulaArray[i].name,
+          depth: valuesFormulaArray[i].depth,
           res: calcRange.text[0][0]
         };
         formulasObjectsArray.push(formulaObject);
-
-    
-        formulasValuesMap.set(valuesFormulaArray[i], calcRange.text[0][0]);
+        
+        /*if (valuesFormulaArray[i].depth == maxDepth){
+          let testRange = calcSheet.getRange(valuesFormulaArray[i].name);
+          testRange.load("values");
+          await context.sync();
+          console.log(typeof testRange.values[0][0] + " : " + testRange.values[0][0]);
+          const formulaObject = {
+            name: valuesFormulaArray[i].name,
+            depth: valuesFormulaArray[i].depth,
+            res: (typeof testRange.values[0][0] === "string" ? "пустая ячейка или текст" : testRange.values[0][0])
+          };
+          formulasObjectsArray.push(formulaObject);
+        } else{
+          let calcRange = calcSheet.getRange("BBB10000"); // new
+          calcRange.formulas = [["=" + valuesFormulaArray[i].name]];
+          calcRange = calcSheet.getRange("BBB10000"); // new
+          calcRange.load("text");
+          calcRange.load("values");
+          await context.sync();
+          const formulaObject = {
+            name: valuesFormulaArray[i].name,
+            depth: valuesFormulaArray[i].depth,
+            res: calcRange.text[0][0]
+          };
+          formulasObjectsArray.push(formulaObject);
+        }*/
       }
 
 
