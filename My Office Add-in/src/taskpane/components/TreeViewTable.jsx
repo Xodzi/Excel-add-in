@@ -6,7 +6,7 @@ const TreeViewTable = ({ data }) => {
     <tr key={node.name}>
       <td style={{paddingLeft: node.depth * 20}}>{node.name.split('(')[0]}</td>
       <td style={{textAlign: "center"}}>{node.res}</td>
-      <td style={{textAlign: "center"}}>Тут будет что-то</td>
+      <td style={{textAlign: "center"}}>cell's address</td>
     </tr>
   );
 

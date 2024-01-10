@@ -257,25 +257,24 @@ const insertText = async () => {
           console.log(i)
           console.log(valuesFormulaArray[i])
           let temp = context.workbook.worksheets.getActiveWorksheet();
-          
           valuesFormulaArray[i].name = valuesFormulaArray[i].name.split("IsCell")[0]
           let temp_range = temp.getRange(valuesFormulaArray[i].name);
           console.log(valuesFormulaArray[i].name.split("IsCell")[0])
-
           temp_range.load("formulas")
           console.log(temp_range)
           await context.sync();
-          if(temp_range.formulas[0][0][0] != undefined){
+
+          if(temp_range.formulas[0][0][0] != undefined && temp_range.formulas[0][0][0].includes("=")){
             console.log(temp_range.formulas[0][0][0])
-            flag = {
-              name: temp_range.formulas[0][0]+"",
-              depth: valuesFormulaArray[i].depth+2,
-              res: null
-            }
+              flag = {
+                name: temp_range.formulas[0][0]+"",
+                depth: valuesFormulaArray[i].depth+2,
+                res: null
+              }
             console.log(flag)
           }
           else{
-            continue
+            continue;
           }
         }
         
@@ -287,7 +286,9 @@ const insertText = async () => {
         calcRange.load("text");
         calcRange.load("values");
         await context.sync();
+        console.log(calcRange)
         console.log(calcRange.text)
+        console.log(calcRange.values[0][0])
 
         if(i == 0){ //проверка чтобы добавить аддрес
           const formulaObject = {
@@ -299,7 +300,7 @@ const insertText = async () => {
           console.log(formulasObjectsArray)
         }
 
-        if(flag != null){
+        if(flag != null && flag.res == null){
           flag.res = calcRange.text[0][0]
           console.log(flag)
           formulasObjectsArray.push(flag);
@@ -307,12 +308,33 @@ const insertText = async () => {
           console.log(formulasObjectsArray)
         }
 
-        const formulaObject = {
-          name: valuesFormulaArray[i].name,
-          depth: valuesFormulaArray[i].depth+1,
-          res: calcRange.text[0][0]
-        };
-        formulasObjectsArray.push(formulaObject);
+        var checkNameRegex = /^[a-zA-Z0-9]+$/;
+
+        if(calcRange.values[0][0] == 0 && checkNameRegex.test(valuesFormulaArray[i].name)){
+          const CalcSheet = context.workbook.worksheets.getActiveWorksheet();
+          let CalcRange = CalcSheet.getRange(valuesFormulaArray[i].name);
+          CalcRange.load("values")
+          await context.sync();
+          console.log(CalcRange)
+          console.log(CalcRange.values)
+          console.log(typeof CalcRange.values[0][0])
+          console.log(valuesFormulaArray[i].name + " NOPE IT'S NOT UNDEFINED")
+          const formulaObject = {
+            name: valuesFormulaArray[i].name,
+            depth: valuesFormulaArray[i].depth+1,
+            res: (typeof CalcRange.values[0][0] === "string" ? " " : calcRange.text[0][0])
+          };
+          console.log(formulasObjectsArray)
+          formulasObjectsArray.push(formulaObject);
+        } else{
+          const formulaObject = {
+            name: valuesFormulaArray[i].name,
+            depth: valuesFormulaArray[i].depth+1,
+            res: (typeof calcRange.values[0][0] === "string" ? " " : calcRange.text[0][0])
+          };
+          console.log(formulasObjectsArray)
+          formulasObjectsArray.push(formulaObject);
+        }
         console.log(formulasObjectsArray)
 
         
