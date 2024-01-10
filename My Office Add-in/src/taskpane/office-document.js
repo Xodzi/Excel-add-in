@@ -129,6 +129,9 @@ const insertText = async () => {
       var lettersFormula = range.formulas[0][0];
       console.log(lettersFormula);
 
+      var arr = lettersFormula.match(/\(([^)]+?)\)/g);
+      var brackets = arr.map(bracket => bracket.match(/\(([^)]+?)\)/)[1])
+      console.log(brackets);
       
       var valuesFormula = "тут должна быть формула с цифрами... или не должна...";
       
@@ -144,6 +147,8 @@ const insertText = async () => {
       console.log(transformedString)
 
       const parseTree = parse(transformedString);
+
+      console.log(parseTree)
 
       setDepth(parseTree,0);
       //________________________________________________
@@ -200,7 +205,7 @@ const insertText = async () => {
             walkTree(node.right, output, depth + 1)
           }
         }
-        console.log(output);
+        //  console.log(output);
         return output;
       };
 
@@ -244,7 +249,7 @@ const insertText = async () => {
 
       const formulasObjectsArray = [];
 
-      console.log(valuesFormulaArray)
+      console.log(brackets)
 
 
       for (var i=0; i<valuesFormulaArray.length; i++) {
@@ -253,7 +258,7 @@ const insertText = async () => {
 
         console.log(valuesFormulaArray[i].name)
 
-        if(valuesFormulaArray[i].name.includes("IsCell")){
+        if(valuesFormulaArray[i].name.includes("IsCell")){ //вынести в отдельный метод, это проверка на то что ячейка ссылается на другую ячейку
           console.log(i)
           console.log(valuesFormulaArray[i])
           let temp = context.workbook.worksheets.getActiveWorksheet();
@@ -261,6 +266,7 @@ const insertText = async () => {
           let temp_range = temp.getRange(valuesFormulaArray[i].name);
           console.log(valuesFormulaArray[i].name.split("IsCell")[0])
           temp_range.load("formulas")
+          temp_range.load("formulasLocal")
           console.log(temp_range)
           await context.sync();
 
@@ -277,6 +283,25 @@ const insertText = async () => {
             continue;
           }
         }
+
+        var containsElement = brackets.filter(element => valuesFormulaArray[i].name.includes(element));
+
+        console.log(containsElement.length)
+        
+        if (containsElement.length > 0) {
+          for(let j =0; j < containsElement.length; j++){
+            var startIndex = valuesFormulaArray[i].name.indexOf(containsElement[j]);
+            var endIndex = startIndex + containsElement[j].length
+            var a = valuesFormulaArray[i].name
+            console.log(endIndex)
+            
+            var output = a.substring(0, startIndex) + '(' + a.substring(startIndex);
+            valuesFormulaArray[i].name = output.substring(0, endIndex+1) + ')' + output.substring(endIndex+1)
+            console.log(valuesFormulaArray[i].name)
+          }
+        }
+        
+
         
         const calcSheet = context.workbook.worksheets.getActiveWorksheet();
         let calcRange = calcSheet.getRange("BBB10000"); // new
@@ -285,10 +310,9 @@ const insertText = async () => {
         calcRange = calcSheet.getRange("BBB10000"); // new
         calcRange.load("text");
         calcRange.load("values");
+        calcRange.load("formulasLocal")
         await context.sync();
         console.log(calcRange)
-        console.log(calcRange.text)
-        console.log(calcRange.values[0][0])
 
         if(i == 0){ //проверка чтобы добавить аддрес
           const formulaObject = {
@@ -305,7 +329,6 @@ const insertText = async () => {
           console.log(flag)
           formulasObjectsArray.push(flag);
           continue;
-          console.log(formulasObjectsArray)
         }
 
         var checkNameRegex = /^[a-zA-Z0-9]+$/;
