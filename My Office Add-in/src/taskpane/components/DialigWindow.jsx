@@ -16,12 +16,11 @@ export default function DialigWindow(props) {
 
   const [array,SetArray] = useState([]);
 
-  //console.log("check after");
-
   useEffect(() => {
     // Получение параметра jsonString из URL
     console.log(props);
     const { jsonString } = queryString.parse(window.location.search);
+    console.log(jsonString)
 
     if (jsonString) {
       // Преобразование JSON-строки в массив и установка состояния

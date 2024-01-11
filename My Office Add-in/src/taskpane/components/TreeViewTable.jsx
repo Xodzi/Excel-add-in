@@ -2,6 +2,7 @@ import React from 'react';
 
 
 const TreeViewTable = ({ data }) => {
+  console.log(data)
   const renderNode = (node) => (
     <tr key={node.name}>
       <td style={{paddingLeft: node.depth * 20}}>{node.name.split('(')[0]}</td>

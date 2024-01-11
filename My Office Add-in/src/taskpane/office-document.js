@@ -103,6 +103,51 @@ function getListIdx(str, substr) {
 }
 
 
+function splitByBrackets(inputString) {
+  const substrings = [];
+  let currentSubstring = '';
+  let bracketDepth = 0;
+
+  for (let character of inputString) {
+      if (character === '(') {
+          bracketDepth++;
+          if (bracketDepth > 1) {
+              currentSubstring += character;
+          }
+      } else if (character === ')') {
+          bracketDepth--;
+          if (bracketDepth > 0) {
+              currentSubstring += character;
+          } else {
+              substrings.push(currentSubstring.trim());
+              currentSubstring = '';
+          }
+      } else if (bracketDepth > 0) {
+          currentSubstring += character;
+      }
+  }
+
+  return substrings;
+}
+
+function processSubstrings(inputString) {
+  let substrings = splitByBrackets(inputString);
+  const allResults = [];
+  for(var i=0; i<substrings.length; i++){
+      allResults.push(substrings[i].replace(/[()]/g, ''));
+  }
+
+  while (substrings.length > 0 && substrings.every(substring => substring !== '')) {
+      substrings = substrings
+          .map(substring => splitByBrackets(substring))
+          .flat();
+      for(var i=0; i<substrings.length; i++){
+          allResults.push(substrings[i].replace(/[()]/g, ''));
+      }
+  }
+
+  return allResults;
+}
 
 
 // main function
@@ -117,9 +162,9 @@ const insertText = async () => {
       range.load("address")
       console.log(range)
       await context.sync();
-      console.log("formulas" + range.formulas[0][0] + ', ' + typeof range.formulas[0][0]);
-      console.log("values, " + range.values[0][0] + ', ' + typeof range.values[0][0]);
-      console.log("text" + range.text[0][0] + ', ' + typeof range.text[0][0]);
+      //console.log("formulas" + range.formulas[0][0] + ', ' + typeof range.formulas[0][0]);
+      //console.log("values, " + range.values[0][0] + ', ' + typeof range.values[0][0]);
+      //console.log("text" + range.text[0][0] + ', ' + typeof range.text[0][0]);
       //if(typeof range.formulas[0][0] == "string") console.log("AHAHAHAHAHAHAH");
       //console.log(typeof range.formulas[0][0]);
       //range.formulas[0][0] = convertRanges(range.formulas[0][0]);
@@ -129,9 +174,17 @@ const insertText = async () => {
       var lettersFormula = range.formulas[0][0];
       console.log(lettersFormula);
 
-      var arr = lettersFormula.match(/\(([^)]+?)\)/g);
-      var brackets = arr.map(bracket => bracket.match(/\(([^)]+?)\)/)[1])
+      var arr = null
+      var brackets = processSubstrings(lettersFormula);
       console.log(brackets);
+      /*if(lettersFormula.includes("(" && ")")){
+        arr = lettersFormula.match(/\(([^)]+?)\)/g)
+        brackets = arr.map(bracket => bracket.match(/\(([^)]+?)\)/)[1])
+        console.log(arr);
+        console.log(brackets);
+      }*/
+      // brackets =["-SUM(A1:C3;A2;B3);AVERAGE(A1*E5;B1;C6;F3;E3;C1/-SUM(A1:C3);C2+D6;C3+4)", "A1:C3;A2;B3", "A1*E5;B1;C6;F3;E3;C1/-SUM(A1:C3);C2+D6;C3+4", "A1:C3"]
+      //brackets =["-SUMA1:C3;A2;B3;AVERAGEA1*E5;B1;C6;F3;E3;C1/-SUMA1:C3;C2+D6;C3+4", "A1:C3;A2;B3", "A1*E5;B1;C6;F3;E3;C1/-SUMA1:C3;C2+D6;C3+4", "A1:C3"]
       
       var valuesFormula = "тут должна быть формула с цифрами... или не должна...";
       
@@ -139,7 +192,7 @@ const insertText = async () => {
       //________________________________________________
 
 
-      //________________________________________________ create arrays with split formulas (сначала надо довести до ума функцию, которая сплитует нашу строку)
+      //________________________________________________ 
 
       const regex = /([A-Z]\d+)\s*([<>]=?|!=)\s*([A-Z]\d+)\s*&\s*([A-Z]\d+)\s*([<>]=?|!=)\s*([A-Z]\d+)/g;
       const transformedString = lettersFormula.replace(regex, "AND($1$2$3, $4$5$6)");
@@ -284,24 +337,23 @@ const insertText = async () => {
           }
         }
 
-        var containsElement = brackets.filter(element => valuesFormulaArray[i].name.includes(element));
-
-        console.log(containsElement.length)
-        
-        if (containsElement.length > 0) {
-          for(let j =0; j < containsElement.length; j++){
-            var startIndex = valuesFormulaArray[i].name.indexOf(containsElement[j]);
-            var endIndex = startIndex + containsElement[j].length
-            var a = valuesFormulaArray[i].name
-            console.log(endIndex)
-            
-            var output = a.substring(0, startIndex) + '(' + a.substring(startIndex);
-            valuesFormulaArray[i].name = output.substring(0, endIndex+1) + ')' + output.substring(endIndex+1)
-            console.log(valuesFormulaArray[i].name)
+        //console.log("tut ostanovka, дальше не идём")
+        if(brackets != []){
+          var containsElement = brackets.filter(element => valuesFormulaArray[i].name.includes(element));
+          console.log(containsElement.length)
+          if (containsElement.length > 0) {
+            for(let j =0; j < containsElement.length; j++){
+              var startIndex = valuesFormulaArray[i].name.indexOf(containsElement[j]);
+              var endIndex = startIndex + containsElement[j].length
+              var a = valuesFormulaArray[i].name
+              console.log(endIndex)
+              
+              var output = a.substring(0, startIndex) + '(' + a.substring(startIndex);
+              valuesFormulaArray[i].name = output.substring(0, endIndex+1) + ')' + output.substring(endIndex+1)
+              console.log(valuesFormulaArray[i].name)
+            }
           }
         }
-        
-
         
         const calcSheet = context.workbook.worksheets.getActiveWorksheet();
         let calcRange = calcSheet.getRange("BBB10000"); // new
